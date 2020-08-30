@@ -12,6 +12,8 @@ namespace DarkPad {
         private static int theme=0;
         private static string fontFamily= "Arial Rounded MT Bold";
         private static float fontSize = 12F;
+        //Isso obtêm o diretório do executável. É necessário porque ao abrir .txt como DarkPad, ele busca o config lá no system32...
+        private static string directory = AppDomain.CurrentDomain.BaseDirectory.ToString()+"\\config.dkp";
 
         public static int Theme{
             get{return theme;}
@@ -25,14 +27,18 @@ namespace DarkPad {
             get { return fontSize; }
             set { fontSize=value; }
         }
+        public static string Directory {
+            get { return directory; }
+        }
 
         public static void LoadConfig() {
             string[] config = new string[3] { Theme.ToString(), FontFamily, FontSize.ToString() };
             string linha = "";
+            
             int i = 0;
 
             try {
-                FileStream arquivo = new FileStream("config.dkp", FileMode.Open, FileAccess.Read);
+                FileStream arquivo = new FileStream(Directory, FileMode.Open, FileAccess.Read);
                 StreamReader leitor = new StreamReader(arquivo);
 
                 leitor.BaseStream.Seek(0, SeekOrigin.Begin);
@@ -48,7 +54,7 @@ namespace DarkPad {
                 leitor.Close();
                 arquivo.Close();
             } catch(Exception ex) {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
                 SaveConfig(Theme, FontFamily, FontSize);
                 LoadConfig();
             }
@@ -61,7 +67,7 @@ namespace DarkPad {
             StreamWriter gravador;
 
             try {
-                arquivo=new FileStream("config.dkp", FileMode.OpenOrCreate, FileAccess.Write);
+                arquivo=new FileStream(Directory, FileMode.OpenOrCreate, FileAccess.Write);
                 gravador=new StreamWriter(arquivo);
 
                 gravador.Flush();

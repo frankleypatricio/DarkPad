@@ -45,11 +45,15 @@ namespace DarkPad {
 
         private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir como...)
             string[] args = Environment.GetCommandLineArgs(); //Obento argumentos da linha de comando
+            string[] extensions = new string[] { ".txt",".html", ".htm", ".css", ".php", ".dkp" };
             foreach(string arg in args) {
-                if(arg.EndsWith(".txt")) { //Tenho tenha passado algum argumento terminado com ".txt"
-                    OpenFile(arg); //Carregando arquivo
-                    altVerif=rich_text.Text;
-                    UpdateTitle(arg);
+                foreach(string v in extensions) {
+                    if(arg.EndsWith(v)) { //Tenho tenha passado algum argumento terminado com ".txt"
+                        OpenFile(arg); //Carregando arquivo
+                        altVerif=rich_text.Text;
+                        UpdateTitle(arg);
+                        break;
+                    }
                 }
             }
         }
