@@ -44,12 +44,13 @@
             this.tool_formatar = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_fonte = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_tema = new System.Windows.Forms.ToolStripMenuItem();
-            this.testeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema0 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema1 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_ajuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_exibirAjuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_sobre = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel_separador = new System.Windows.Forms.Panel();
+            this.sep_topBorder = new System.Windows.Forms.Panel();
             this.save_file = new System.Windows.Forms.SaveFileDialog();
             this.open_file = new System.Windows.Forms.OpenFileDialog();
             this.font_custom = new System.Windows.Forms.FontDialog();
@@ -258,7 +259,7 @@
             this.tool_fonte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_fonte.ForeColor = System.Drawing.Color.White;
             this.tool_fonte.Name = "tool_fonte";
-            this.tool_fonte.Size = new System.Drawing.Size(123, 22);
+            this.tool_fonte.Size = new System.Drawing.Size(180, 22);
             this.tool_fonte.Text = "Fonte...";
             this.tool_fonte.Click += new System.EventHandler(this.Font_Click);
             // 
@@ -266,19 +267,30 @@
             // 
             this.tool_tema.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.testeToolStripMenuItem});
+            this.tool_tema0,
+            this.tool_tema1});
             this.tool_tema.ForeColor = System.Drawing.Color.White;
             this.tool_tema.Name = "tool_tema";
-            this.tool_tema.Size = new System.Drawing.Size(123, 22);
+            this.tool_tema.Size = new System.Drawing.Size(180, 22);
             this.tool_tema.Text = "Tema";
             // 
-            // testeToolStripMenuItem
+            // tool_tema0
             // 
-            this.testeToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.testeToolStripMenuItem.ForeColor = System.Drawing.Color.White;
-            this.testeToolStripMenuItem.Name = "testeToolStripMenuItem";
-            this.testeToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
-            this.testeToolStripMenuItem.Text = "Teste";
+            this.tool_tema0.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema0.ForeColor = System.Drawing.Color.White;
+            this.tool_tema0.Name = "tool_tema0";
+            this.tool_tema0.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema0.Text = "Dark Grey-Blue";
+            this.tool_tema0.Click += new System.EventHandler(this.Tema0_Click);
+            // 
+            // tool_tema1
+            // 
+            this.tool_tema1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema1.ForeColor = System.Drawing.Color.White;
+            this.tool_tema1.Name = "tool_tema1";
+            this.tool_tema1.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema1.Text = "Dark Purple-Hot Pink";
+            this.tool_tema1.Click += new System.EventHandler(this.Tema1_Click);
             // 
             // tool_ajuda
             // 
@@ -317,14 +329,14 @@
             this.toolStripMenuItem7.Size = new System.Drawing.Size(108, 22);
             this.toolStripMenuItem7.Text = "Teste";
             // 
-            // panel_separador
+            // sep_topBorder
             // 
-            this.panel_separador.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-            this.panel_separador.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel_separador.Location = new System.Drawing.Point(0, 25);
-            this.panel_separador.Name = "panel_separador";
-            this.panel_separador.Size = new System.Drawing.Size(842, 3);
-            this.panel_separador.TabIndex = 2;
+            this.sep_topBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+            this.sep_topBorder.Dock = System.Windows.Forms.DockStyle.Top;
+            this.sep_topBorder.Location = new System.Drawing.Point(0, 25);
+            this.sep_topBorder.Name = "sep_topBorder";
+            this.sep_topBorder.Size = new System.Drawing.Size(842, 3);
+            this.sep_topBorder.TabIndex = 2;
             // 
             // save_file
             // 
@@ -343,7 +355,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(842, 441);
-            this.Controls.Add(this.panel_separador);
+            this.Controls.Add(this.sep_topBorder);
             this.Controls.Add(this.rich_text);
             this.Controls.Add(this.menu_main);
             this.MainMenuStrip = this.menu_main;
@@ -364,7 +376,7 @@
         private System.Windows.Forms.RichTextBox rich_text;
         private System.Windows.Forms.MenuStrip menu_main;
         private System.Windows.Forms.ToolStripMenuItem tool_arquivo;
-        private System.Windows.Forms.Panel panel_separador;
+        private System.Windows.Forms.Panel sep_topBorder;
         private System.Windows.Forms.ToolStripMenuItem tool_novo;
         private System.Windows.Forms.ToolStripMenuItem tool_salvar;
         private System.Windows.Forms.ToolStripMenuItem tool_savar_como;
@@ -382,7 +394,7 @@
         private System.Windows.Forms.ToolStripMenuItem tool_formatar;
         private System.Windows.Forms.ToolStripMenuItem tool_fonte;
         private System.Windows.Forms.ToolStripMenuItem tool_tema;
-        private System.Windows.Forms.ToolStripMenuItem testeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema0;
         private System.Windows.Forms.SaveFileDialog save_file;
         private System.Windows.Forms.OpenFileDialog open_file;
         private System.Windows.Forms.ToolStripMenuItem tool_ajuda;
@@ -391,6 +403,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
         private System.Windows.Forms.FontDialog font_custom;
         private System.Windows.Forms.ToolStripMenuItem tool_substituir;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema1;
     }
 }
 

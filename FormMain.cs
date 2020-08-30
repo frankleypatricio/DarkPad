@@ -14,24 +14,33 @@ namespace DarkPad {
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
         private string openedFileDirectory; //Guarda o diretório do atual arquivo aberto
         private form_locate localizar; //Para abrir o Form do localizar
-        int theme; //Guarda o ID do tema atual em uso
+        public int theme; //Guarda o ID do tema atual em uso
         static private RichTextBox staticRichText; //Serve para referenciar a rich_text para o método Localize(), por ele ser static, precisa de membros static
         static public int initialLocate; //Local inicial para a pesquisa na hora de buscar próxima ocorrência
         //static private form_main staticFormMain;
+        private List<ToolStripMenuItem> toolStripThemes; //Guarda o ToolStripMenuItem de todos os temas
 
         public form_main() {
             InitializeComponent();
+            Temas.LoadConfig();
 
             //Inicializando variáveis
-            theme=0; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
+            theme=Temas.Theme; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
+            rich_text.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
             altVerif="";
             openedFileDirectory="";
             staticRichText=rich_text;
             //staticFormMain=this;
-            menu_main.Renderer=new MyRenderer(); //Adicionando o nosso Renderer personalizado ao menu_main
+            menu_main.Renderer=new MyRenderer(theme); //Adicionando o nosso Renderer personalizado ao menu_main
+
+            toolStripThemes=new List<ToolStripMenuItem>();
+            toolStripThemes.Add(tool_tema0);
+            toolStripThemes.Add(tool_tema1);
+            toolStripThemes[theme].Checked=true; //Checa o ToolStripMenuItem do tema atual
 
             //Chamando funções iniciais
             UpdateTitle("");
+            ChangeTheme(theme, false);
         }
 
         private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir como...)
@@ -42,6 +51,19 @@ namespace DarkPad {
                     altVerif=rich_text.Text;
                     UpdateTitle(arg);
                 }
+            }
+        }
+
+        private void ChangeTheme(int theme, bool alterTheme) { //Alterar tema do programa
+            rich_text.BackColor=Temas.GetPrimaryColor(theme);
+            menu_main.BackColor=Temas.GetSecondaryColor(theme);
+            sep_topBorder.BackColor=Temas.GetTopBorderColor(theme);
+            menu_main.Renderer=new MyRenderer(theme); //Adicionando novo renderer
+
+            if(alterTheme==true) {
+                toolStripThemes[this.theme].Checked=false; //Remove Checked do tema anterior
+                this.theme=theme;
+                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size);
             }
         }
 
@@ -273,14 +295,27 @@ namespace DarkPad {
 
         /* < Menu -> Formatar > */
         private void Font_Click(object sender, EventArgs e) { //Botão Fonte...
-            if(rich_text.SelectedText!="") font_custom.Font=rich_text.SelectionFont;
-            else font_custom.Font=rich_text.Font;
+            font_custom.Font=rich_text.Font;
 
             if(font_custom.ShowDialog() == DialogResult.OK) {
-                if(rich_text.SelectedText!="") rich_text.SelectionFont=font_custom.Font;
-                else rich_text.Font=font_custom.Font;
+                rich_text.SelectionFont=font_custom.Font;
+                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size);
             }
 
+        }
+
+        private void Tema0_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            if(!toolStripThemes[0].Checked) {
+                ChangeTheme(0,true);
+                toolStripThemes[0].Checked=true;
+            }
+        }
+
+        private void Tema1_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            if(!toolStripThemes[1].Checked) {
+                ChangeTheme(1,true);
+                toolStripThemes[1].Checked=true;
+            }
         }
         //Fim -> Menu Formatar
 
@@ -311,11 +346,17 @@ namespace DarkPad {
     }
 
     public class MyRenderer : ToolStripProfessionalRenderer { //Isso é para editar a cor de foco dos itens no menu
-        public MyRenderer() : base(new MyColors()) { }
+        public MyRenderer(int theme) : base(new MyColors(theme)) { }
     }
     public class MyColors : ProfessionalColorTable { //Aqui é onde editaremos as cores das funções herdades do ProfessionalColorTable
+        private int theme;
+
+        public MyColors(int theme) {
+            this.theme=theme;
+        }
         public override Color MenuItemSelected { //Ao passar o mouse
-            get { return Color.FromArgb(9, 158, 182); }
+            //get { return Color.FromArgb(9, 158, 182); }
+            get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuItemSelectedGradientBegin { //Adiciona um Gradient (inicio) -> Ao passar o mouse
             get { return Color.FromArgb(9,158,182); }
