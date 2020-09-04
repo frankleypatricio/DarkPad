@@ -46,10 +46,12 @@
             this.tool_tema = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_tema0 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_tema1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema4 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_ajuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_exibirAjuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_sobre = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.sep_topBorder = new System.Windows.Forms.Panel();
             this.save_file = new System.Windows.Forms.SaveFileDialog();
             this.open_file = new System.Windows.Forms.OpenFileDialog();
@@ -268,7 +270,10 @@
             this.tool_tema.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tool_tema0,
-            this.tool_tema1});
+            this.tool_tema1,
+            this.tool_tema2,
+            this.tool_tema3,
+            this.tool_tema4});
             this.tool_tema.ForeColor = System.Drawing.Color.White;
             this.tool_tema.Name = "tool_tema";
             this.tool_tema.Size = new System.Drawing.Size(180, 22);
@@ -292,6 +297,33 @@
             this.tool_tema1.Text = "Dark Purple-Hot Pink";
             this.tool_tema1.Click += new System.EventHandler(this.Tema1_Click);
             // 
+            // tool_tema2
+            // 
+            this.tool_tema2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema2.ForeColor = System.Drawing.Color.White;
+            this.tool_tema2.Name = "tool_tema2";
+            this.tool_tema2.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema2.Text = "Dark Blue-Green";
+            this.tool_tema2.Click += new System.EventHandler(this.Tema2_Click);
+            // 
+            // tool_tema3
+            // 
+            this.tool_tema3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema3.ForeColor = System.Drawing.Color.White;
+            this.tool_tema3.Name = "tool_tema3";
+            this.tool_tema3.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema3.Text = "Dark Grey-Yellow";
+            this.tool_tema3.Click += new System.EventHandler(this.Tema3_Click);
+            // 
+            // tool_tema4
+            // 
+            this.tool_tema4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema4.ForeColor = System.Drawing.Color.White;
+            this.tool_tema4.Name = "tool_tema4";
+            this.tool_tema4.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema4.Text = "White-Classic";
+            this.tool_tema4.Click += new System.EventHandler(this.Tema4_Click);
+            // 
             // tool_ajuda
             // 
             this.tool_ajuda.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -314,20 +346,10 @@
             // tool_sobre
             // 
             this.tool_sobre.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.tool_sobre.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem7});
             this.tool_sobre.ForeColor = System.Drawing.Color.White;
             this.tool_sobre.Name = "tool_sobre";
             this.tool_sobre.Size = new System.Drawing.Size(151, 22);
             this.tool_sobre.Text = "Sobre";
-            // 
-            // toolStripMenuItem7
-            // 
-            this.toolStripMenuItem7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.toolStripMenuItem7.ForeColor = System.Drawing.Color.White;
-            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(108, 22);
-            this.toolStripMenuItem7.Text = "Teste";
             // 
             // sep_topBorder
             // 
@@ -400,10 +422,12 @@
         private System.Windows.Forms.ToolStripMenuItem tool_ajuda;
         private System.Windows.Forms.ToolStripMenuItem tool_exibirAjuda;
         private System.Windows.Forms.ToolStripMenuItem tool_sobre;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
         private System.Windows.Forms.FontDialog font_custom;
         private System.Windows.Forms.ToolStripMenuItem tool_substituir;
         private System.Windows.Forms.ToolStripMenuItem tool_tema1;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema2;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema3;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema4;
     }
 }
 

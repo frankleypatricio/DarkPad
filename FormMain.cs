@@ -19,10 +19,12 @@ namespace DarkPad {
         static public int initialLocate; //Local inicial para a pesquisa na hora de buscar próxima ocorrência
         //static private form_main staticFormMain;
         private List<ToolStripMenuItem> toolStripThemes; //Guarda o ToolStripMenuItem de todos os temas
+        private ToolStripItemCollection allToolStrip; //Guarda todos os ToolStripMenuItem
 
         public form_main() {
             InitializeComponent();
             Temas.LoadConfig();
+            this.Size=new Size(Temas.FormSize[0], Temas.FormSize[1]); //Alterando size do form para o salvo no arquivo config
 
             //Inicializando variáveis
             theme=Temas.Theme; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
@@ -33,10 +35,14 @@ namespace DarkPad {
             //staticFormMain=this;
             menu_main.Renderer=new MyRenderer(theme); //Adicionando o nosso Renderer personalizado ao menu_main
 
+            //Preenchendo listas de ToolStripMenuItem
             toolStripThemes=new List<ToolStripMenuItem>();
-            toolStripThemes.Add(tool_tema0);
-            toolStripThemes.Add(tool_tema1);
+            foreach(ToolStripMenuItem v in tool_tema.DropDownItems) {
+                toolStripThemes.Add(v);
+            }
             toolStripThemes[theme].Checked=true; //Checa o ToolStripMenuItem do tema atual
+
+            allToolStrip=menu_main.Items;
 
             //Chamando funções iniciais
             UpdateTitle("");
@@ -59,16 +65,33 @@ namespace DarkPad {
         }
 
         private void ChangeTheme(int theme, bool alterTheme) { //Alterar tema do programa
+            rich_text.ForeColor=Temas.GetFontColor(theme);
             rich_text.BackColor=Temas.GetPrimaryColor(theme);
+            menu_main.ForeColor=Temas.GetFontColor(theme);
             menu_main.BackColor=Temas.GetSecondaryColor(theme);
             sep_topBorder.BackColor=Temas.GetTopBorderColor(theme);
             menu_main.Renderer=new MyRenderer(theme); //Adicionando novo renderer
 
-            if(alterTheme==true) {
-                toolStripThemes[this.theme].Checked=false; //Remove Checked do tema anterior
-                this.theme=theme;
-                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size);
+            int[] formSize = new int[2] { this.Width, this.Height };
+            toolStripThemes[this.theme].Checked=false; //Remove Checked do tema anterior
+            this.theme=theme;
+
+            foreach(ToolStripMenuItem v in allToolStrip) {
+                //Console.WriteLine(v.BackColor);
+                v.ForeColor=Temas.GetFontColor(theme);
+                for(int i = 0; i<v.DropDownItems.Count; i++) {
+                    v.DropDownItems[i].BackColor=Temas.GetSecondaryColor(theme);
+                    v.DropDownItems[i].ForeColor=Temas.GetFontColor(theme);
+                }
+                //Console.WriteLine(v.BackColor);
             }
+            for(int i = 0; i<toolStripThemes.Count; i++) {
+                toolStripThemes[i].BackColor=Temas.GetSecondaryColor(theme);
+                toolStripThemes[i].ForeColor=Temas.GetFontColor(theme);
+            }
+            toolStripThemes[theme].Checked=true;
+
+            if(alterTheme==true) Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
         }
 
         private void UpdateTitle(string fileDirectory) { //Atualiza título do Form e o atual diretório aberto
@@ -302,8 +325,9 @@ namespace DarkPad {
             font_custom.Font=rich_text.Font;
 
             if(font_custom.ShowDialog() == DialogResult.OK) {
+                int[] formSize = new int[2] { this.Width, this.Height };
                 rich_text.SelectionFont=font_custom.Font;
-                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size);
+                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
             }
 
         }
@@ -314,11 +338,28 @@ namespace DarkPad {
                 toolStripThemes[0].Checked=true;
             }
         }
-
         private void Tema1_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
             if(!toolStripThemes[1].Checked) {
                 ChangeTheme(1,true);
                 toolStripThemes[1].Checked=true;
+            }
+        }
+        private void Tema2_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            if(!toolStripThemes[2].Checked) {
+                ChangeTheme(2, true);
+                toolStripThemes[2].Checked=true;
+            }
+        }
+        private void Tema3_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            if(!toolStripThemes[3].Checked) {
+                ChangeTheme(3, true);
+                toolStripThemes[3].Checked=true;
+            }
+        }
+        private void Tema4_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            if(!toolStripThemes[4].Checked) {
+                ChangeTheme(4, true);
+                toolStripThemes[4].Checked=true;
             }
         }
         //Fim -> Menu Formatar
@@ -345,7 +386,12 @@ namespace DarkPad {
             if(rich_text.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
             else if(openedFileDirectory!=""&&altVerif!=rich_text.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
-            if(result==DialogResult.Cancel) return;
+            if(result==DialogResult.Cancel) return; //Se cancelou o fechamento
+
+            if(this.Width != Temas.FormSize[0] || this.Height != Temas.FormSize[1]) { //Se alterou o size do form
+                int[] formSize = new int[] { this.Width, this.Height };
+                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
+            }
         }
     }
 
@@ -363,19 +409,19 @@ namespace DarkPad {
             get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuItemSelectedGradientBegin { //Adiciona um Gradient (inicio) -> Ao passar o mouse
-            get { return Color.FromArgb(9,158,182); }
+            get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuItemSelectedGradientEnd { //Adiciona um Gradient (fim) -> Ao passar o mouse (tem middle tb)
-            get { return Color.FromArgb(9, 158, 182); }
+            get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuItemPressedGradientBegin { //Adiciona um Gradient (inicio) -> Ao clicar em um menu (abrindo seus sub menus)
-            get { return Color.FromArgb(9, 158, 182); }
+            get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuItemPressedGradientEnd { //Adiciona um Gradient (inicio) -> Ao clicar em um menu (abrindo seus sub menus)
-            get { return Color.FromArgb(9, 158, 182); }
+            get { return Temas.GetMenuItemSelectedColor(theme); }
         }
         public override Color MenuBorder { //Borda do tool menu
-            get { return Color.White; }
+            get { return Temas.GetMenuBorderColor(theme); }
         }
     }
 }
