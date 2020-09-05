@@ -14,7 +14,7 @@ namespace DarkPad {
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
         private string openedFileDirectory; //Guarda o diretório do atual arquivo aberto
         private form_locate localizar; //Para abrir o Form do localizar
-        public int theme; //Guarda o ID do tema atual em uso
+        private int theme; //Guarda o ID do tema atual em uso
         static private RichTextBox staticRichText; //Serve para referenciar a rich_text para o método Localize(), por ele ser static, precisa de membros static
         static public int initialLocate; //Local inicial para a pesquisa na hora de buscar próxima ocorrência
         //static private form_main staticFormMain;

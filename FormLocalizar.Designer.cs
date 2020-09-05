@@ -32,14 +32,14 @@
             this.tab_editar = new System.Windows.Forms.TabControl();
             this.tab_localizar = new System.Windows.Forms.TabPage();
             this.tab_substituir = new System.Windows.Forms.TabPage();
+            this.lbl_substituir = new System.Windows.Forms.Label();
+            this.panel_sepSubstituir = new System.Windows.Forms.Panel();
+            this.txt_substituir = new System.Windows.Forms.TextBox();
+            this.panel_sepOriginal = new System.Windows.Forms.Panel();
             this.btn_substituir = new System.Windows.Forms.Button();
             this.cbx_caseSubst = new System.Windows.Forms.CheckBox();
             this.lbl_original = new System.Windows.Forms.Label();
             this.txt_original = new System.Windows.Forms.TextBox();
-            this.panel_original = new System.Windows.Forms.Panel();
-            this.txt_substituir = new System.Windows.Forms.TextBox();
-            this.panel_substituir = new System.Windows.Forms.Panel();
-            this.lbl_substituir = new System.Windows.Forms.Label();
             this.tab_editar.SuspendLayout();
             this.tab_localizar.SuspendLayout();
             this.tab_substituir.SuspendLayout();
@@ -51,9 +51,9 @@
             this.txt_locate.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txt_locate.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txt_locate.ForeColor = System.Drawing.Color.White;
-            this.txt_locate.Location = new System.Drawing.Point(109, 21);
+            this.txt_locate.Location = new System.Drawing.Point(119, 21);
             this.txt_locate.Name = "txt_locate";
-            this.txt_locate.Size = new System.Drawing.Size(372, 22);
+            this.txt_locate.Size = new System.Drawing.Size(362, 22);
             this.txt_locate.TabIndex = 0;
             // 
             // lbl_locate
@@ -70,9 +70,9 @@
             // panel_sepLocate
             // 
             this.panel_sepLocate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.panel_sepLocate.Location = new System.Drawing.Point(109, 45);
+            this.panel_sepLocate.Location = new System.Drawing.Point(119, 45);
             this.panel_sepLocate.Name = "panel_sepLocate";
-            this.panel_sepLocate.Size = new System.Drawing.Size(372, 3);
+            this.panel_sepLocate.Size = new System.Drawing.Size(362, 3);
             this.panel_sepLocate.TabIndex = 2;
             // 
             // btn_prox
@@ -150,9 +150,9 @@
             // 
             this.tab_substituir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.tab_substituir.Controls.Add(this.lbl_substituir);
-            this.tab_substituir.Controls.Add(this.panel_substituir);
+            this.tab_substituir.Controls.Add(this.panel_sepSubstituir);
             this.tab_substituir.Controls.Add(this.txt_substituir);
-            this.tab_substituir.Controls.Add(this.panel_original);
+            this.tab_substituir.Controls.Add(this.panel_sepOriginal);
             this.tab_substituir.Controls.Add(this.btn_substituir);
             this.tab_substituir.Controls.Add(this.cbx_caseSubst);
             this.tab_substituir.Controls.Add(this.lbl_original);
@@ -163,6 +163,44 @@
             this.tab_substituir.Size = new System.Drawing.Size(594, 99);
             this.tab_substituir.TabIndex = 1;
             this.tab_substituir.Text = "Substituir";
+            // 
+            // lbl_substituir
+            // 
+            this.lbl_substituir.AutoSize = true;
+            this.lbl_substituir.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_substituir.ForeColor = System.Drawing.Color.White;
+            this.lbl_substituir.Location = new System.Drawing.Point(306, 2);
+            this.lbl_substituir.Name = "lbl_substituir";
+            this.lbl_substituir.Size = new System.Drawing.Size(110, 22);
+            this.lbl_substituir.TabIndex = 12;
+            this.lbl_substituir.Text = "Substituir: ";
+            // 
+            // panel_sepSubstituir
+            // 
+            this.panel_sepSubstituir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.panel_sepSubstituir.Location = new System.Drawing.Point(307, 52);
+            this.panel_sepSubstituir.Name = "panel_sepSubstituir";
+            this.panel_sepSubstituir.Size = new System.Drawing.Size(275, 3);
+            this.panel_sepSubstituir.TabIndex = 11;
+            // 
+            // txt_substituir
+            // 
+            this.txt_substituir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+            this.txt_substituir.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txt_substituir.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txt_substituir.ForeColor = System.Drawing.Color.White;
+            this.txt_substituir.Location = new System.Drawing.Point(307, 26);
+            this.txt_substituir.Name = "txt_substituir";
+            this.txt_substituir.Size = new System.Drawing.Size(275, 22);
+            this.txt_substituir.TabIndex = 11;
+            // 
+            // panel_sepOriginal
+            // 
+            this.panel_sepOriginal.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.panel_sepOriginal.Location = new System.Drawing.Point(12, 52);
+            this.panel_sepOriginal.Name = "panel_sepOriginal";
+            this.panel_sepOriginal.Size = new System.Drawing.Size(275, 3);
+            this.panel_sepOriginal.TabIndex = 10;
             // 
             // btn_substituir
             // 
@@ -213,44 +251,6 @@
             this.txt_original.Size = new System.Drawing.Size(275, 22);
             this.txt_original.TabIndex = 6;
             // 
-            // panel_original
-            // 
-            this.panel_original.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.panel_original.Location = new System.Drawing.Point(12, 52);
-            this.panel_original.Name = "panel_original";
-            this.panel_original.Size = new System.Drawing.Size(275, 3);
-            this.panel_original.TabIndex = 10;
-            // 
-            // txt_substituir
-            // 
-            this.txt_substituir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.txt_substituir.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txt_substituir.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txt_substituir.ForeColor = System.Drawing.Color.White;
-            this.txt_substituir.Location = new System.Drawing.Point(307, 26);
-            this.txt_substituir.Name = "txt_substituir";
-            this.txt_substituir.Size = new System.Drawing.Size(275, 22);
-            this.txt_substituir.TabIndex = 11;
-            // 
-            // panel_substituir
-            // 
-            this.panel_substituir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            this.panel_substituir.Location = new System.Drawing.Point(307, 52);
-            this.panel_substituir.Name = "panel_substituir";
-            this.panel_substituir.Size = new System.Drawing.Size(275, 3);
-            this.panel_substituir.TabIndex = 11;
-            // 
-            // lbl_substituir
-            // 
-            this.lbl_substituir.AutoSize = true;
-            this.lbl_substituir.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_substituir.ForeColor = System.Drawing.Color.White;
-            this.lbl_substituir.Location = new System.Drawing.Point(306, 2);
-            this.lbl_substituir.Name = "lbl_substituir";
-            this.lbl_substituir.Size = new System.Drawing.Size(110, 22);
-            this.lbl_substituir.TabIndex = 12;
-            this.lbl_substituir.Text = "Substituir: ";
-            // 
             // form_locate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -283,13 +283,13 @@
         private System.Windows.Forms.TabControl tab_editar;
         private System.Windows.Forms.TabPage tab_localizar;
         private System.Windows.Forms.TabPage tab_substituir;
-        private System.Windows.Forms.Panel panel_original;
+        private System.Windows.Forms.Panel panel_sepOriginal;
         private System.Windows.Forms.Button btn_substituir;
         private System.Windows.Forms.CheckBox cbx_caseSubst;
         private System.Windows.Forms.Label lbl_original;
         private System.Windows.Forms.TextBox txt_original;
         private System.Windows.Forms.Label lbl_substituir;
-        private System.Windows.Forms.Panel panel_substituir;
+        private System.Windows.Forms.Panel panel_sepSubstituir;
         private System.Windows.Forms.TextBox txt_substituir;
     }
 }
