@@ -12,6 +12,7 @@ using System.Windows.Forms;
 namespace DarkPad {
     public partial class form_main : Form {
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
+        private bool hasSave; //Guarda se precisa salvar o arquivo ou não
         private string openedFileDirectory; //Guarda o diretório do atual arquivo aberto
         private form_locate localizar; //Para abrir o Form do localizar
         private int theme; //Guarda o ID do tema atual em uso
@@ -30,7 +31,8 @@ namespace DarkPad {
             theme=Temas.Theme; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
             rich_text.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
             altVerif="";
-            openedFileDirectory="";
+            hasSave=false;
+            openedFileDirectory ="";
             staticRichText=rich_text;
             //staticFormMain=this;
             menu_main.Renderer=new MyRenderer(theme); //Adicionando o nosso Renderer personalizado ao menu_main
@@ -57,6 +59,7 @@ namespace DarkPad {
                     if(arg.EndsWith(v)) { //Tenho tenha passado algum argumento terminado com ".txt"
                         OpenFile(arg); //Carregando arquivo
                         altVerif=rich_text.Text;
+                        hasSave=false;
                         UpdateTitle(arg);
                         break;
                     }
@@ -141,6 +144,7 @@ namespace DarkPad {
                 MessageBox.Show("Não foi possível salvar o arquivo\n"+ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+            RichText_TextChanged(null, null); //Remover o * do título
             return true;
         }
 
@@ -211,13 +215,24 @@ namespace DarkPad {
             MessageBox.Show("Ocorrências substituidas com sucesso!", "Concluído", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void SelectionChanged(object sender, EventArgs e) {
+        private void SelectionChanged(object sender, EventArgs e) { //Alterou seleção (isso é pro localizar/substituir)
             if(rich_text.SelectionLength>0) initialLocate=rich_text.SelectionStart;
             else initialLocate=0;
-            Console.WriteLine(initialLocate);
+            //Console.WriteLine(initialLocate);
         }
 
-        /* <Menu -> Arquivo> */
+        private void RichText_TextChanged(object sender, EventArgs e) { //Alterar texto da RichTextBox
+            //Isso é pra mostrar um " * " antes do título pra indicar que o arquivo foi editado e não salvo
+            if(rich_text.Text != altVerif & hasSave == false) {
+                this.Text="*"+this.Text;
+                hasSave=true;
+            }else if(rich_text.Text == altVerif) { 
+                this.Text=this.Text.Remove(0, 1);
+                hasSave=false;
+            }
+        }
+
+            /* <Menu -> Arquivo> */
         private void NewFile_Click(object sender, EventArgs e) { //Botão Novo
             DialogResult result = DialogResult.None;
 
@@ -231,6 +246,7 @@ namespace DarkPad {
             if(result!=DialogResult.Cancel) {
                 rich_text.Clear();
                 altVerif="";
+                hasSave=false;
                 UpdateTitle("");
             }
         }
@@ -249,6 +265,7 @@ namespace DarkPad {
             if(result!=DialogResult.Cancel&&open_file.ShowDialog()==DialogResult.OK) {
                 OpenFile(open_file.FileName);
                 altVerif=rich_text.Text;
+                hasSave=false;
                 UpdateTitle(open_file.FileName); //CONCERTAR ISSO, POIS ESTÁ PEGANDO O DIRETÓRIO DO ARQUIVO
             }
         }
@@ -261,6 +278,7 @@ namespace DarkPad {
                     if(SaveFile(save_file.FileName)==false) return;
                     else {
                         altVerif=rich_text.Text;
+                        hasSave=false;
                         UpdateTitle(save_file.FileName);
                     }
                 } else return;
@@ -272,6 +290,7 @@ namespace DarkPad {
                 if(SaveFile(save_file.FileName)==false) return;
                 else {
                     altVerif=rich_text.Text;
+                    hasSave=false;
                     UpdateTitle(save_file.FileName); //CONCERTAR ISSO, POIS ESTÁ PEGANDO O DIRETÓRIO DO ARQUIVO
                 }
             }
@@ -364,7 +383,13 @@ namespace DarkPad {
         }
         //Fim -> Menu Formatar
 
-        /* <Atalhos do Teclado> */
+        /* < Menu -> Ajuda > */
+        private void Sobre_Click(object sender, EventArgs e) { //Botão Sobre
+            Console.WriteLine(rich_text.Text);
+        }
+            //Fim -> Menu Ajuda
+
+            /* <Atalhos do Teclado> */
         private void Hotkeys_KeyUp(object sender, KeyEventArgs e) { //Atalhos do Teclado
             //Não sei se passar null e como parâmetro dá problema... Vendo pelo lado de que nem é utilizado dentro destas funções específicas (as chamadas após o if)... Então não (Usar o e do KeyEventArgs e também funciona)
             if(e.Control && e.KeyCode==Keys.S) Save_Click(null, null); //Se der problema só usar assim: Save_Click(tool_salvar, null);

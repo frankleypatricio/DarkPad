@@ -73,6 +73,7 @@
             this.rich_text.TabIndex = 0;
             this.rich_text.Text = "";
             this.rich_text.SelectionChanged += new System.EventHandler(this.SelectionChanged);
+            this.rich_text.TextChanged += new System.EventHandler(this.RichText_TextChanged);
             this.rich_text.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Hotkeys_KeyUp);
             // 
             // menu_main
@@ -351,6 +352,7 @@
             this.tool_sobre.Name = "tool_sobre";
             this.tool_sobre.Size = new System.Drawing.Size(151, 22);
             this.tool_sobre.Text = "Sobre";
+            this.tool_sobre.Click += new System.EventHandler(this.Sobre_Click);
             // 
             // sep_topBorder
             // 
