@@ -24,7 +24,6 @@
         /// </summary>
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_main));
-            this.rich_text = new System.Windows.Forms.RichTextBox();
             this.menu_main = new System.Windows.Forms.MenuStrip();
             this.tool_arquivo = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_novo = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,22 +58,6 @@
             this.font_custom = new System.Windows.Forms.FontDialog();
             this.menu_main.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // rich_text
-            // 
-            this.rich_text.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-            this.rich_text.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.rich_text.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rich_text.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rich_text.ForeColor = System.Drawing.Color.White;
-            this.rich_text.Location = new System.Drawing.Point(0, 25);
-            this.rich_text.Name = "rich_text";
-            this.rich_text.Size = new System.Drawing.Size(842, 416);
-            this.rich_text.TabIndex = 0;
-            this.rich_text.Text = "";
-            this.rich_text.SelectionChanged += new System.EventHandler(this.SelectionChanged);
-            this.rich_text.TextChanged += new System.EventHandler(this.RichText_TextChanged);
-            this.rich_text.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Hotkeys_KeyUp);
             // 
             // menu_main
             // 
@@ -185,6 +168,7 @@
             this.tool_recortar.Name = "tool_recortar";
             this.tool_recortar.Size = new System.Drawing.Size(213, 22);
             this.tool_recortar.Text = "Recortar (Ctrl + X)";
+            this.tool_recortar.Click += new System.EventHandler(this.Cut_Click);
             // 
             // tool_copiar
             // 
@@ -193,6 +177,7 @@
             this.tool_copiar.Name = "tool_copiar";
             this.tool_copiar.Size = new System.Drawing.Size(213, 22);
             this.tool_copiar.Text = "Copiar (Ctrl + C)";
+            this.tool_copiar.Click += new System.EventHandler(this.Copy_Click);
             // 
             // tool_colar
             // 
@@ -201,6 +186,7 @@
             this.tool_colar.Name = "tool_colar";
             this.tool_colar.Size = new System.Drawing.Size(213, 22);
             this.tool_colar.Text = "Colar (Ctrl + V)";
+            this.tool_colar.Click += new System.EventHandler(this.Paste_Click);
             // 
             // tool_deletar
             // 
@@ -344,6 +330,7 @@
             this.tool_exibirAjuda.Name = "tool_exibirAjuda";
             this.tool_exibirAjuda.Size = new System.Drawing.Size(151, 22);
             this.tool_exibirAjuda.Text = "Exibir Ajuda";
+            this.tool_exibirAjuda.Click += new System.EventHandler(this.Ajuda_Click);
             // 
             // tool_sobre
             // 
@@ -379,9 +366,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(842, 441);
             this.Controls.Add(this.sep_topBorder);
-            this.Controls.Add(this.rich_text);
             this.Controls.Add(this.menu_main);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu_main;
@@ -398,8 +385,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.RichTextBox rich_text;
         private System.Windows.Forms.MenuStrip menu_main;
         private System.Windows.Forms.ToolStripMenuItem tool_arquivo;
         private System.Windows.Forms.Panel sep_topBorder;

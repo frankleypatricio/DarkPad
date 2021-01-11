@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -15,6 +11,7 @@ namespace DarkPad {
         private static int[] formSize = new int[2] { 858, 480 };
         //Isso obtêm o diretório do executável. É necessário porque ao abrir .txt como DarkPad, ele busca o config lá no system32...
         private static string directory = AppDomain.CurrentDomain.BaseDirectory.ToString()+"\\config.dkp";
+        private static string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); //Desktop do user atual
 
         public static int Theme{
             get{return theme;}
@@ -35,9 +32,13 @@ namespace DarkPad {
             get { return formSize; }
             set { formSize=value; }
         }
+        public static string InitialDirectory {
+            get { return initialDirectory; }
+            set { initialDirectory=value; }
+        }
 
         public static void LoadConfig() {
-            string[] config = new string[5] { Theme.ToString(), FontFamily, FontSize.ToString(), FormSize[0].ToString(), FormSize[1].ToString() };
+            string[] config = new string[6] { Theme.ToString(), FontFamily, FontSize.ToString(), FormSize[0].ToString(), FormSize[1].ToString(), InitialDirectory };
             string linha = "";
             
             int i = 0;
@@ -57,19 +58,20 @@ namespace DarkPad {
                 FontSize=float.Parse(config[2]);
                 FormSize[0]=int.Parse(config[3]);
                 FormSize[1]=int.Parse(config[4]);
+                InitialDirectory=config[5];
 
                 leitor.Close();
                 arquivo.Close();
-            } catch(Exception ex) {
+            } catch(Exception /*ex*/) {
                 //Console.WriteLine(ex.Message);
-                SaveConfig(Theme, FontFamily, FontSize, FormSize);
+                SaveConfig(Theme, FontFamily, FontSize, FormSize, InitialDirectory);
                 LoadConfig();
             }
         }
         /*public static int LoadTheme() {
             StreamWriter gravador
         }*/
-        public static void SaveConfig(int theme, string fontFamily, float fontSize, int[] formSize) {
+        public static void SaveConfig(int theme, string fontFamily, float fontSize, int[] formSize, string initialDirectory) {
             FileStream arquivo;
             StreamWriter gravador;
 
@@ -83,7 +85,8 @@ namespace DarkPad {
                 gravador.Write(fontFamily+"\n");
                 gravador.Write(fontSize+"\n");
                 gravador.Write(formSize[0]+"\n");
-                gravador.Write(formSize[1]);
+                gravador.Write(formSize[1]+"\n");
+                gravador.Write(initialDirectory);
                 gravador.Flush();
 
                 Theme=theme;

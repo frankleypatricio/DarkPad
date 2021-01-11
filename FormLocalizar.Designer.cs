@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_locate));
             this.txt_locate = new System.Windows.Forms.TextBox();
             this.lbl_locate = new System.Windows.Forms.Label();
             this.panel_sepLocate = new System.Windows.Forms.Panel();
@@ -259,9 +260,11 @@
             this.ClientSize = new System.Drawing.Size(594, 132);
             this.Controls.Add(this.tab_editar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "form_locate";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Localizar";
             this.tab_editar.ResumeLayout(false);
             this.tab_localizar.ResumeLayout(false);

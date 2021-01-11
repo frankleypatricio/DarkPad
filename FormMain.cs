@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DarkPad {
@@ -16,24 +11,45 @@ namespace DarkPad {
         private string openedFileDirectory; //Guarda o diretório do atual arquivo aberto
         private form_locate localizar; //Para abrir o Form do localizar
         private int theme; //Guarda o ID do tema atual em uso
-        static private RichTextBox staticRichText; //Serve para referenciar a rich_text para o método Localize(), por ele ser static, precisa de membros static
+        //static private RichTextBox staticRichText; //Serve para referenciar a myText para o método Localize(), por ele ser static, precisa de membros static
         static public int initialLocate; //Local inicial para a pesquisa na hora de buscar próxima ocorrência
         //static private form_main staticFormMain;
-        private List<ToolStripMenuItem> toolStripThemes; //Guarda o ToolStripMenuItem de todos os temas
-        private ToolStripItemCollection allToolStrip; //Guarda todos os ToolStripMenuItem
+        private readonly List<ToolStripMenuItem> toolStripThemes; //Guarda o ToolStripMenuItem de todos os temas
+        private readonly ToolStripItemCollection allToolStrip; //Guarda todos os ToolStripMenuItem
+
+        static private readonly MyTextBox myText = new MyTextBox();
 
         public form_main() {
             InitializeComponent();
+            //Definindo MyTextBox
+            myText.Multiline=true;
+            myText.BackColor=Color.FromArgb(45, 45, 48);
+            myText.ForeColor=Color.FromArgb(255,255,255);
+            myText.Font=new Font("Arial Rounded MT Bold", 12);
+            myText.BorderStyle=BorderStyle.None;
+            Console.WriteLine(myText.MaxLength); //MÁXIMO DE CARACTERES QUE PODEM SER DIGITADOS (PADRÃO: 32767)
+            myText.HideSelection=false; //Isso faz com que a seleção não seja ocultada ao perder o foco do form
+            myText.ScrollBars=ScrollBars.Vertical; 
+            myText.Dock=DockStyle.Fill;
+            //Eventos
+            myText.KeyUp+=new KeyEventHandler(Hotkeys_KeyUp);
+            myText.SelectionChanged+=new EventHandler(SelectionChanged);
+            myText.MouseUp+=new MouseEventHandler(myText.SelectionHasChanged); //Serve pra acionar o SelectionChanged quando o usuário seleciona manualmente
+            myText.TextChanged+=new EventHandler(MyText_TextChanged);
+            //Adivionando ao form
+            this.Controls.Add(myText);
+            myText.BringToFront();
+
             Temas.LoadConfig();
             this.Size=new Size(Temas.FormSize[0], Temas.FormSize[1]); //Alterando size do form para o salvo no arquivo config
 
             //Inicializando variáveis
             theme=Temas.Theme; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
-            rich_text.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
+            myText.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
             altVerif="";
             hasSave=false;
             openedFileDirectory ="";
-            staticRichText=rich_text;
+            //staticRichText=myText;
             //staticFormMain=this;
             menu_main.Renderer=new MyRenderer(theme); //Adicionando o nosso Renderer personalizado ao menu_main
 
@@ -49,6 +65,7 @@ namespace DarkPad {
             //Chamando funções iniciais
             UpdateTitle("");
             ChangeTheme(theme, false);
+            UpdateInitialDirectory(Temas.InitialDirectory);
         }
 
         private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir como...)
@@ -56,9 +73,10 @@ namespace DarkPad {
             string[] extensions = new string[] { ".txt",".html", ".htm", ".css", ".php", ".dkp" };
             foreach(string arg in args) {
                 foreach(string v in extensions) {
-                    if(arg.EndsWith(v)) { //Tenho tenha passado algum argumento terminado com ".txt"
+                    if(arg.EndsWith(v)) { //Caso tenha passado algum argumento terminado com ".txt"
                         OpenFile(arg); //Carregando arquivo
-                        altVerif=rich_text.Text;
+                        myText.Select(0,0); //Isso para parar de selecionar tudo ao abrir arquivo como
+                        altVerif=myText.Text;
                         hasSave=false;
                         UpdateTitle(arg);
                         break;
@@ -67,9 +85,13 @@ namespace DarkPad {
             }
         }
 
+        private void UpdateInitialDirectory(string dir) { //Altera o diretório inicial do save/open dialog para o último local acessado
+            Temas.InitialDirectory= open_file.InitialDirectory= save_file.InitialDirectory= dir;
+        }
+
         private void ChangeTheme(int theme, bool alterTheme) { //Alterar tema do programa
-            rich_text.ForeColor=Temas.GetFontColor(theme);
-            rich_text.BackColor=Temas.GetPrimaryColor(theme);
+            myText.ForeColor=Temas.GetFontColor(theme);
+            myText.BackColor=Temas.GetPrimaryColor(theme);
             menu_main.ForeColor=Temas.GetFontColor(theme);
             menu_main.BackColor=Temas.GetSecondaryColor(theme);
             sep_topBorder.BackColor=Temas.GetTopBorderColor(theme);
@@ -94,7 +116,7 @@ namespace DarkPad {
             }
             toolStripThemes[theme].Checked=true;
 
-            if(alterTheme==true) Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
+            if(alterTheme==true) Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
         }
 
         private void UpdateTitle(string fileDirectory) { //Atualiza título do Form e o atual diretório aberto
@@ -119,6 +141,7 @@ namespace DarkPad {
 
                     if(save_file.ShowDialog()==DialogResult.OK) {
                         if(SaveFile(save_file.FileName)==false) return DialogResult.Cancel;
+                        UpdateInitialDirectory(save_file.FileName.Remove(save_file.FileName.LastIndexOf(@"\")));
                     } else return DialogResult.Cancel;
 
                 } else if(SaveFile(save_file.FileName)==false) return DialogResult.Cancel;
@@ -129,13 +152,14 @@ namespace DarkPad {
         private bool SaveFile(string fileName) { //Salvar arquivo
             StreamWriter gravador;
             FileStream arquivo;
+            string text = myText.Text.Replace("\r\n", ""); //Isso é para não ficar com quebra de linha dobrada ao salvar
             try {
                 arquivo=new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
                 gravador=new StreamWriter(arquivo);
 
                 gravador.Flush();
                 gravador.BaseStream.Seek(0, SeekOrigin.Begin);
-                gravador.Write(rich_text.Text);
+                gravador.Write(text);
                 gravador.Flush();
 
                 gravador.Close();
@@ -144,7 +168,7 @@ namespace DarkPad {
                 MessageBox.Show("Não foi possível salvar o arquivo\n"+ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            RichText_TextChanged(null, null); //Remover o * do título
+            MyText_TextChanged(null, null); //Remover o * do título
             return true;
         }
 
@@ -154,39 +178,42 @@ namespace DarkPad {
             StreamReader leitor = new StreamReader(arquivo);
 
             leitor.BaseStream.Seek(0, SeekOrigin.Begin);
-            rich_text.Clear();
+            myText.Clear();
             linha=leitor.ReadLine();
             while(linha!=null) {
-                rich_text.Text+=linha+"\n";
+                //myText.Text+=linha+"\n"; - RichTextBox
+                myText.Text+=linha+"\r\n"; //TextBox
                 linha=leitor.ReadLine();
             }
+            myText.Text=myText.Text.Replace("\n", "\r\n"); //Substituindo \n por \r\n, porque o TextBox não suporta o \n comum por algum motivo...
 
             leitor.Close();
             arquivo.Close();
         }
         
-        public static int Localize(string toLocate, int type, bool caseSense, int initialLocate) { //Serve pra localizar a próxima palavra ou anterior passada no form_localizar
+        public static int Locate(string toLocate, int type, bool caseSense, int initialLocate) { //Serve pra localizar a próxima palavra ou anterior passada no form_localizar
             int next = 0, prev=-1, richLenght=0; //next: posição da próxima localização; prev: posição do inicio-tamanho da localização atual; richLenght: tamanho da localização atual; 
             int selectionStart = 0; //Guarda a posição inicial do texto selecionado
             bool found=false; //Se no botão anterior foi encontrado ou não a localização
 
-            RichTextBoxFinds caseSensitive=new RichTextBoxFinds(); //Com Case Sensitive
-            if(caseSense==false) caseSensitive=RichTextBoxFinds.None; //Sem Case Sensitive
-            else caseSensitive=RichTextBoxFinds.MatchCase;
+            /*RichTextBoxFinds caseSensitive=new RichTextBoxFinds();
+            if(caseSense==false) caseSensitive=RichTextBoxFinds.None; //Com Case Sensitive
+            else caseSensitive=RichTextBoxFinds.MatchCase; //Sem Case Sensitive*/
 
-            if(initialLocate!=0) next=initialLocate+staticRichText.SelectionLength;
-            if(staticRichText.SelectedText != "") selectionStart=staticRichText.SelectionStart;
-
+            if(initialLocate!=0) next=initialLocate+myText.SelectionLength;
+            if(myText.SelectedText != "") selectionStart=myText.SelectionStart;
+            
             if(type==0) { //Próximo
-                if(staticRichText.Find(toLocate, next, caseSensitive)==-1) {
+                if(myText.Find(toLocate, next, false, caseSense)==-1) {
                     MessageBox.Show("Não foi possível localizar \""+toLocate+"\"", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return selectionStart;
                 }
             } else { //Anterior
-                richLenght=staticRichText.SelectionLength;
-                prev=next-richLenght;
+                richLenght=myText.SelectionLength;
+                prev=initialLocate; //prev=next-richLenght;
                 for(int i=prev-richLenght; i>0; i-=richLenght) { //i-=richLenght porque assim ele confere do 210-200 (por exemplo) e no próximo confere do 220-210, e por aí vai...
-                    if(staticRichText.Find(toLocate, i, prev, caseSensitive)!=-1) {
+                    Console.WriteLine("i={0}, initialLocate={1}, richLenght={2}", i,initialLocate,richLenght);
+                    if(myText.Find(toLocate, i, true, caseSense)!=-1) {
                         found=true;
                         break;
                     }
@@ -197,37 +224,37 @@ namespace DarkPad {
                     return selectionStart;
                 }
             }
-            return staticRichText.SelectionStart;
+            return myText.SelectionStart;
         }
 
         public static void Replace(string text, string toReplace, bool caseSense) {
-            RichTextBoxFinds caseSensitive = RichTextBoxFinds.None;
-            if(caseSense == true) caseSensitive=RichTextBoxFinds.MatchCase;
+            /*RichTextBoxFinds caseSensitive = RichTextBoxFinds.None;
+            if(caseSense == true) caseSensitive=RichTextBoxFinds.MatchCase;*/
 
-            if(staticRichText.Find(text, caseSensitive) ==-1) {
+            if(myText.Find(text, caseSense) ==-1) {
                 MessageBox.Show("Não foi possível localizar \""+text+"\"", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            while(staticRichText.Find(text, caseSensitive)!=-1) {
-                staticRichText.SelectedText=toReplace; //Percorre todo o RichText substituindo toda ocorrência do texto passado
+            while(myText.Find(text, caseSense)!=-1) {
+                myText.SelectedText=toReplace; //Percorre todo o RichText substituindo toda ocorrência do texto passado
             }
             MessageBox.Show("Ocorrências substituidas com sucesso!", "Concluído", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void SelectionChanged(object sender, EventArgs e) { //Alterou seleção (isso é pro localizar/substituir)
-            if(rich_text.SelectionLength>0) initialLocate=rich_text.SelectionStart;
+            if(myText.SelectionLength>0) initialLocate=myText.SelectionStart;
             else initialLocate=0;
             //Console.WriteLine(initialLocate);
         }
 
-        private void RichText_TextChanged(object sender, EventArgs e) { //Alterar texto da RichTextBox
+        private void MyText_TextChanged(object sender, EventArgs e) { //Alterar texto da RichTextBox
             //Isso é pra mostrar um " * " antes do título pra indicar que o arquivo foi editado e não salvo
-            if(rich_text.Text != altVerif & hasSave == false) {
+            if(myText.Text != altVerif & hasSave == false) {
                 this.Text="*"+this.Text;
                 hasSave=true;
-            }else if(rich_text.Text == altVerif) { 
-                this.Text=this.Text.Remove(0, 1);
+            }else if(myText.Text == altVerif) {
+                if(this.Text.Contains("*")) this.Text=this.Text.Remove(0, 1);
                 hasSave=false;
             }
         }
@@ -237,14 +264,14 @@ namespace DarkPad {
             DialogResult result = DialogResult.None;
 
             Console.WriteLine("altVerif: "+altVerif);
-            Console.WriteLine("RichTextBox: "+rich_text.Text);
+            Console.WriteLine("RichTextBox: "+myText.Text);
             Console.WriteLine("openedFileDirectory: "+openedFileDirectory);
 
-            if(rich_text.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=rich_text.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result!=DialogResult.Cancel) {
-                rich_text.Clear();
+                myText.Clear();
                 altVerif="";
                 hasSave=false;
                 UpdateTitle("");
@@ -259,25 +286,26 @@ namespace DarkPad {
         private void OpenFile_Click(object sender, EventArgs e) { //Botão Abrir
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
 
-            if(rich_text.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=rich_text.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result!=DialogResult.Cancel&&open_file.ShowDialog()==DialogResult.OK) {
                 OpenFile(open_file.FileName);
-                altVerif=rich_text.Text;
+                altVerif=myText.Text;
                 hasSave=false;
-                UpdateTitle(open_file.FileName); //CONCERTAR ISSO, POIS ESTÁ PEGANDO O DIRETÓRIO DO ARQUIVO
+                UpdateTitle(open_file.FileName);
+                UpdateInitialDirectory(open_file.FileName.Remove(open_file.FileName.LastIndexOf(@"\")));
             }
         }
 
         private void Save_Click(object sender, EventArgs e) { //Botão Salvar
             if(openedFileDirectory!="") {
-                if(SaveFile(openedFileDirectory)==true) altVerif=rich_text.Text;
+                if(SaveFile(openedFileDirectory)==true) altVerif=myText.Text;
             } else {
                 if(save_file.ShowDialog()==DialogResult.OK) {
                     if(SaveFile(save_file.FileName)==false) return;
                     else {
-                        altVerif=rich_text.Text;
+                        altVerif=myText.Text;
                         hasSave=false;
                         UpdateTitle(save_file.FileName);
                     }
@@ -289,7 +317,7 @@ namespace DarkPad {
             if(save_file.ShowDialog()==DialogResult.OK) {
                 if(SaveFile(save_file.FileName)==false) return;
                 else {
-                    altVerif=rich_text.Text;
+                    altVerif=myText.Text;
                     hasSave=false;
                     UpdateTitle(save_file.FileName); //CONCERTAR ISSO, POIS ESTÁ PEGANDO O DIRETÓRIO DO ARQUIVO
                 }
@@ -299,8 +327,8 @@ namespace DarkPad {
         private void Exit_Click(object sender, EventArgs e) { //Botão Sair
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
 
-            if(rich_text.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=rich_text.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result!=DialogResult.Cancel) this.Close();
         }
@@ -308,47 +336,46 @@ namespace DarkPad {
 
         /* < Menu -> Editar > */
         private void Cut_Click(object sender, EventArgs e) { //Botão Recortar
-            if(rich_text.SelectionLength > 0) rich_text.Cut(); //Recortando seleção atual pra área de transferência
+            if(myText.SelectionLength > 0) myText.Cut(); //Recortando seleção atual pra área de transferência
         }
         private void Copy_Click(object sender, EventArgs e) { //Botão Copiar
-            if(rich_text.SelectionLength > 0) rich_text.Copy(); //Copiando seleção atual pra área de transferência
+            if(myText.SelectionLength > 0) myText.Copy(); //Copiando seleção atual pra área de transferência
         }
         private void Paste_Click(object sender, EventArgs e) { //Botão Colar
-            rich_text.Paste(); //Colando texto da área de transferência
+            myText.Paste(); //Colando texto da área de transferência
         }
         private void Delete_Click(object sender, EventArgs e) { //Botão Deletar
-            if(rich_text.SelectedText!="") rich_text.SelectedText="";
+            if(myText.SelectedText!="") myText.SelectedText="";
             else MessageBox.Show("Selecione um trexo para deletar", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Locate_Click(object sender, EventArgs e) { //Botão Localizar
-            localizar=new form_locate(theme,0);
+            localizar=new form_locate(theme,0,myText.SelectedText,this);
             localizar.Show();
         }
         private void LocateNext_Click(object sender, EventArgs e) { //Botão Localizar Próxima
-            if(rich_text.SelectedText != "") Localize(rich_text.SelectedText, 0, false, initialLocate);
+            if(myText.SelectedText != "") Locate(myText.SelectedText, 0, false, initialLocate);
             else MessageBox.Show("Selecione um trexo para localizar outras ocorrências do mesmo ou use a opção \"Localizar (Crtl+F)\"", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void LocatePrevious_Click(object sender, EventArgs e) { //Botão Localizar Anterior
-            if(rich_text.SelectedText!="") Localize(rich_text.SelectedText, 1, false, initialLocate);
+            if(myText.SelectedText!="") Locate(myText.SelectedText, 1, false, initialLocate);
             else MessageBox.Show("Selecione um trexo para localizar outras ocorrências do mesmo ou use a opção \"Localizar (Crtl+F)\"", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void Replace_Click(object sender, EventArgs e) { //Botão Substituir
-            localizar=new form_locate(theme,1);
+            localizar=new form_locate(theme,1,myText.SelectedText, this);
             localizar.Show();
         }
         //Fim -> Menu Editar
 
         /* < Menu -> Formatar > */
         private void Font_Click(object sender, EventArgs e) { //Botão Fonte...
-            font_custom.Font=rich_text.Font;
+            font_custom.Font=myText.Font;
 
             if(font_custom.ShowDialog() == DialogResult.OK) {
                 int[] formSize = new int[2] { this.Width, this.Height };
-                rich_text.SelectionFont=font_custom.Font;
-                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
+                myText.Font=font_custom.Font;
+                Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
             }
-
         }
 
         private void Tema0_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
@@ -385,11 +412,17 @@ namespace DarkPad {
 
         /* < Menu -> Ajuda > */
         private void Sobre_Click(object sender, EventArgs e) { //Botão Sobre
-            Console.WriteLine(rich_text.Text);
+            MessageBox.Show("DarkPad Versão 2.0\n" +
+                            "Desenvolvido por Frankley Patrício. Todos os Direitos Reservados © 2020\n" +
+                            "Acesse o reposítório no GitHub para mais informações\n" +
+                            "https://github.com/BlackBird-1/DarkPad", "Sobre o Darkpad", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-            //Fim -> Menu Ajuda
+        private void Ajuda_Click(object sender, EventArgs e) { //Botão Exibir Ajuda
+            
+        }
+        //Fim -> Menu Ajuda
 
-            /* <Atalhos do Teclado> */
+        /* <Atalhos do Teclado> */
         private void Hotkeys_KeyUp(object sender, KeyEventArgs e) { //Atalhos do Teclado
             //Não sei se passar null e como parâmetro dá problema... Vendo pelo lado de que nem é utilizado dentro destas funções específicas (as chamadas após o if)... Então não (Usar o e do KeyEventArgs e também funciona)
             if(e.Control && e.KeyCode==Keys.S) Save_Click(null, null); //Se der problema só usar assim: Save_Click(tool_salvar, null);
@@ -408,14 +441,14 @@ namespace DarkPad {
         private void form_main_FormClosing(object sender, FormClosingEventArgs e) {
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
 
-            if(rich_text.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=rich_text.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result==DialogResult.Cancel) return; //Se cancelou o fechamento
 
             if(this.Width != Temas.FormSize[0] || this.Height != Temas.FormSize[1]) { //Se alterou o size do form
                 int[] formSize = new int[] { this.Width, this.Height };
-                Temas.SaveConfig(theme, rich_text.Font.FontFamily.Name, rich_text.Font.Size, formSize);
+                Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
             }
         }
     }
@@ -424,7 +457,7 @@ namespace DarkPad {
         public MyRenderer(int theme) : base(new MyColors(theme)) { }
     }
     public class MyColors : ProfessionalColorTable { //Aqui é onde editaremos as cores das funções herdades do ProfessionalColorTable
-        private int theme;
+        private readonly int theme;
 
         public MyColors(int theme) {
             this.theme=theme;
