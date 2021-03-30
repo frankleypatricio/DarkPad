@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 namespace DarkPad {
     public partial class form_main : Form {
+        private string[] args; //Argumentos de entrada
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
         private bool hasSave; //Guarda se precisa salvar o arquivo ou não
         private string openedFileDirectory; //Guarda o diretório do atual arquivo aberto
@@ -19,9 +20,10 @@ namespace DarkPad {
 
         static private readonly MyTextBox myText = new MyTextBox();
 
-        public form_main() {
+        public form_main(string[] args) {
             InitializeComponent();
             //Definindo MyTextBox
+            this.args=args;
             myText.Multiline=true;
             myText.BackColor=Color.FromArgb(45, 45, 48);
             myText.ForeColor=Color.FromArgb(255,255,255);
@@ -68,18 +70,20 @@ namespace DarkPad {
             UpdateInitialDirectory(Temas.InitialDirectory);
         }
 
-        private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir como...)
-            string[] args = Environment.GetCommandLineArgs(); //Obento argumentos da linha de comando
-            string[] extensions = new string[] { ".txt",".html", ".htm", ".css", ".php", ".dkp" };
-            foreach(string arg in args) {
-                foreach(string v in extensions) {
-                    if(arg.EndsWith(v)) { //Caso tenha passado algum argumento terminado com ".txt"
-                        OpenFile(arg); //Carregando arquivo
-                        myText.Select(0,0); //Isso para parar de selecionar tudo ao abrir arquivo como
-                        altVerif=myText.Text;
-                        hasSave=false;
-                        UpdateTitle(arg);
-                        break;
+        private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir com...)
+            //string[] args = Environment.GetCommandLineArgs(); //Obento argumentos da linha de comando
+            if(args.Length >0) { //Se passou algum argumento
+                string[] extensions = new string[] { ".txt", ".html", ".htm", ".css", ".php", ".dkp" };
+                foreach(string arg in args) {
+                    foreach(string v in extensions) {
+                        if(arg.EndsWith(v)) { //Caso tenha passado algum argumento terminado com uma das extenções da lista
+                            OpenFile(arg); //Carregando arquivo
+                            myText.Select(0, 0); //Isso para parar de selecionar tudo ao abrir arquivo como
+                            altVerif=myText.Text;
+                            hasSave=false;
+                            UpdateTitle(arg);
+                            break;
+                        }
                     }
                 }
             }
@@ -124,7 +128,7 @@ namespace DarkPad {
             int lastBar = 0;
             if(fileName.Length>0) {
                 lastBar=1+fileName.LastIndexOf("\\"); //Encontrando posição da última ocorrência de um \ (1+ porque posição começa com 0 e aqui retorna tamanho normal)
-                fileName=fileName.Remove(0, lastBar); //Removendo texto da posição 0 até lastBar 
+                fileName=fileName.Remove(0, lastBar); //Removendo texto da posição 0 até o lastBar 
             }
 
             if(fileName!="") this.Text=fileName+" - Darkpad";
@@ -152,8 +156,18 @@ namespace DarkPad {
         private bool SaveFile(string fileName) { //Salvar arquivo
             StreamWriter gravador;
             FileStream arquivo;
-            string text = myText.Text.Replace("\r\n", ""); //Isso é para não ficar com quebra de linha dobrada ao salvar
+            string text = myText.Text.Replace("\r\n", "\n");
+            //string text = myText.Text.Replace("\r\n", ""); //Isso é para não ficar com quebra de linha dobrada ao salvar
             try {
+                /* Obs:
+                 * Não está salvando alterações em arquivos existente que tenham links, desde que essa alteração seja apenas
+                 * apagando algum conteúdo. Caso adicione algo, ele salva normalmente.
+                 * Deletando o arquivo e recriando resolve o problema...
+                */
+                if(File.Exists(fileName)) File.Delete(fileName); //Deletando o arquivo porque não estava salvando alguns arquivos...
+                Console.WriteLine("\nFileName: {0}", fileName);
+                Console.WriteLine("\nText: {0}", text);
+                Console.WriteLine("\nAltVerif: {0}", altVerif);
                 arquivo=new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
                 gravador=new StreamWriter(arquivo);
 
@@ -176,16 +190,17 @@ namespace DarkPad {
             string linha = null;
             FileStream arquivo = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             StreamReader leitor = new StreamReader(arquivo);
+            string text = "";
 
             leitor.BaseStream.Seek(0, SeekOrigin.Begin);
             myText.Clear();
             linha=leitor.ReadLine();
             while(linha!=null) {
                 //myText.Text+=linha+"\n"; - RichTextBox
-                myText.Text+=linha+"\r\n"; //TextBox
+                text+=linha+"\n";
                 linha=leitor.ReadLine();
             }
-            myText.Text=myText.Text.Replace("\n", "\r\n"); //Substituindo \n por \r\n, porque o TextBox não suporta o \n comum por algum motivo...
+            myText.Text=text.Replace("\n", "\r\n"); //Substituindo \n por \r\n, porque o TextBox não suporta o \n comum por algum motivo...
 
             leitor.Close();
             arquivo.Close();
@@ -248,7 +263,7 @@ namespace DarkPad {
             //Console.WriteLine(initialLocate);
         }
 
-        private void MyText_TextChanged(object sender, EventArgs e) { //Alterar texto da RichTextBox
+        private void MyText_TextChanged(object sender, EventArgs e) { //Alterar texto da TextBox
             //Isso é pra mostrar um " * " antes do título pra indicar que o arquivo foi editado e não salvo
             if(myText.Text != altVerif & hasSave == false) {
                 this.Text="*"+this.Text;
@@ -267,8 +282,8 @@ namespace DarkPad {
             Console.WriteLine("RichTextBox: "+myText.Text);
             Console.WriteLine("openedFileDirectory: "+openedFileDirectory);
 
-            if(myText.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!="" && altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result!=DialogResult.Cancel) {
                 myText.Clear();
@@ -280,7 +295,7 @@ namespace DarkPad {
 
         private void NewWindow_Click(object sender, EventArgs e) { //Botão Nova janela
             //Não tá pegando porque está fazendo referência ao form_main já aberto...
-            new form_main().Show();
+            new form_main(null).Show();
         }
 
         private void OpenFile_Click(object sender, EventArgs e) { //Botão Abrir
@@ -311,6 +326,7 @@ namespace DarkPad {
                     }
                 } else return;
             }
+            MyText_TextChanged(null, null);
         }
 
         private void SaveAs_Click(object sender, EventArgs e) { //Botão Salvar Como...
@@ -415,7 +431,7 @@ namespace DarkPad {
             MessageBox.Show("DarkPad Versão 2.0\n" +
                             "Desenvolvido por Frankley Patrício. Todos os Direitos Reservados © 2020\n" +
                             "Acesse o reposítório no GitHub para mais informações\n" +
-                            "https://github.com/BlackBird-1/DarkPad", "Sobre o Darkpad", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            "https://github.com/frankleypatricio/DarkPad", "Sobre o Darkpad", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void Ajuda_Click(object sender, EventArgs e) { //Botão Exibir Ajuda
             

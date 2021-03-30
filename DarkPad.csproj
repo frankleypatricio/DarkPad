@@ -121,7 +121,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="D.ico" />
     <None Include="txt.ico" />
     <None Include="Darkpad.ico" />
     <None Include="Resources\Darkpad1.ico" />
