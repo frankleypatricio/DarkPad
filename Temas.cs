@@ -5,12 +5,14 @@ using System.Windows.Forms;
 
 namespace DarkPad {
     public static class Temas {
+        private static int x = 0;
+        private static readonly string[] configParams = new string[] { "theme", "font-family", "font-size", "form-width", "form-height", "initial-directory" }; // Parâmetros das configurações
         private static int theme=0;
         private static string fontFamily= "Arial Rounded MT Bold";
         private static float fontSize = 12F;
         private static int[] formSize = new int[2] { 858, 480 };
         //Isso obtêm o diretório do executável. É necessário porque ao abrir .txt como DarkPad, ele busca o config lá no system32...
-        private static string directory = AppDomain.CurrentDomain.BaseDirectory.ToString()+"\\config.dkp";
+        private static readonly string directory = AppDomain.CurrentDomain.BaseDirectory.ToString()+"\\config.dkp";
         private static string initialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); //Desktop do user atual
 
         public static int Theme{
@@ -38,64 +40,64 @@ namespace DarkPad {
         }
 
         public static void LoadConfig() {
+            string[] check = new string[2]; // Serve para checar a integridade dos dados do arquivo config
+            int indexSep; // Index do separador (=)
             string[] config = new string[6] { Theme.ToString(), FontFamily, FontSize.ToString(), FormSize[0].ToString(), FormSize[1].ToString(), InitialDirectory };
-            string linha = "";
-            
-            int i = 0;
+            string linha;
 
             try {
-                FileStream arquivo = new FileStream(Directory, FileMode.Open, FileAccess.Read);
-                StreamReader leitor = new StreamReader(arquivo);
+                using(var arquivo = new FileStream(Directory, FileMode.Open, FileAccess.Read)) {
+                    using(var leitor = new StreamReader(arquivo)) {
+                        leitor.BaseStream.Seek(0, SeekOrigin.Begin);
+                        linha=leitor.ReadLine();
 
-                leitor.BaseStream.Seek(0, SeekOrigin.Begin);
-                linha=leitor.ReadLine();
-                while(linha!=null) {
-                    config[i++]=linha;
-                    linha=leitor.ReadLine();
+                        for(int i = 0; i<config.Length; i++) {
+                            if(linha==null) break;
+
+                            indexSep=linha.IndexOf("=");
+                            check[0]=linha.Remove(indexSep);
+                            check[1]=linha.Remove(0, indexSep+1);
+
+                            if(check[0] != configParams[i]) throw new Exception("O arquivo \"config.dkp\" está corrompido");
+
+                            config[i]=check[1];
+                            linha=leitor.ReadLine();
+                        }
+
+                        Theme=int.Parse(config[0]);
+                        FontFamily=config[1];
+                        FontSize=float.Parse(config[2]);
+                        FormSize[0]=int.Parse(config[3]);
+                        FormSize[1]=int.Parse(config[4]);
+                        InitialDirectory=config[5];
+                    }
                 }
-                Theme=int.Parse(config[0]);
-                FontFamily=config[1];
-                FontSize=float.Parse(config[2]);
-                FormSize[0]=int.Parse(config[3]);
-                FormSize[1]=int.Parse(config[4]);
-                InitialDirectory=config[5];
-
-                leitor.Close();
-                arquivo.Close();
             } catch(Exception /*ex*/) {
                 //Console.WriteLine(ex.Message);
                 SaveConfig(Theme, FontFamily, FontSize, FormSize, InitialDirectory);
                 LoadConfig();
             }
         }
-        /*public static int LoadTheme() {
-            StreamWriter gravador
-        }*/
+
         public static void SaveConfig(int theme, string fontFamily, float fontSize, int[] formSize, string initialDirectory) {
-            FileStream arquivo;
-            StreamWriter gravador;
-
             try {
-                arquivo=new FileStream(Directory, FileMode.OpenOrCreate, FileAccess.Write);
-                gravador=new StreamWriter(arquivo);
+                using(var arquivo = new FileStream(Directory, FileMode.OpenOrCreate, FileAccess.Write)) {
+                    using(var gravador = new StreamWriter(arquivo)) {
+                        gravador.Flush();
+                        gravador.BaseStream.Seek(0, SeekOrigin.Begin);
+                        gravador.Write(configParams[0]+"="+theme+"\n");
+                        gravador.Write(configParams[1]+"="+fontFamily+"\n");
+                        gravador.Write(configParams[2]+"="+fontSize+"\n");
+                        gravador.Write(configParams[3]+"="+formSize[0]+"\n");
+                        gravador.Write(configParams[4]+"="+formSize[1]+"\n");
+                        gravador.Write(configParams[5]+"="+initialDirectory);
+                        gravador.Flush();
 
-                gravador.Flush();
-                gravador.BaseStream.Seek(0,SeekOrigin.Begin);
-                gravador.Write(theme+"\n");
-                gravador.Write(fontFamily+"\n");
-                gravador.Write(fontSize+"\n");
-                gravador.Write(formSize[0]+"\n");
-                gravador.Write(formSize[1]+"\n");
-                gravador.Write(initialDirectory);
-                gravador.Flush();
-
-                Theme=theme;
-                FontFamily=fontFamily;
-                FontSize=fontSize;
-
-                gravador.Close();
-                arquivo.Close();
-
+                        Theme=theme;
+                        FontFamily=fontFamily;
+                        FontSize=fontSize;
+                    }
+                }
             } catch(Exception ex) {
                 MessageBox.Show("Não foi possível salvar as configurações\n"+ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -109,7 +111,7 @@ namespace DarkPad {
                 case 2: return Color.FromArgb(16, 29, 37);
                 case 3: return Color.FromArgb(45, 45, 48);
                 case 4: return Color.FromArgb(255, 255, 255);
-                default: return Color.FromArgb(0, 122, 204);
+                default: return Color.FromArgb(45, 45, 48);
             }
         }
 

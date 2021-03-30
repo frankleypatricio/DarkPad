@@ -9,4 +9,3 @@ D:\htdocs\Projetos no Visual Studio\C#\DarkPad\obj\Debug\DarkPad.csproj.CoreComp
 D:\htdocs\Projetos no Visual Studio\C#\DarkPad\obj\Debug\DarkPad.exe
 D:\htdocs\Projetos no Visual Studio\C#\DarkPad\obj\Debug\DarkPad.pdb
 D:\htdocs\Projetos no Visual Studio\C#\DarkPad\obj\Debug\DarkPad.form_locate.resources
-D:\htdocs\Projetos no Visual Studio\C#\DarkPad\obj\Debug\DarkPad.FormAjuda.resources

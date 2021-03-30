@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace DarkPad {
     public partial class form_main : Form {
+        private const string github = "https://github.com/frankleypatricio/DarkPad";
+
         private string[] args; //Argumentos de entrada
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
         private bool hasSave; //Guarda se precisa salvar o arquivo ou não
@@ -42,12 +45,13 @@ namespace DarkPad {
             this.Controls.Add(myText);
             myText.BringToFront();
 
+            //Carregando configurações de Tema
             Temas.LoadConfig();
+            theme=Temas.Theme;
             this.Size=new Size(Temas.FormSize[0], Temas.FormSize[1]); //Alterando size do form para o salvo no arquivo config
+            myText.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
 
             //Inicializando variáveis
-            theme=Temas.Theme; //MODIFICAR PRA MÉTODO QUE IRÁ BUSCAR O VALOR
-            myText.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
             altVerif="";
             hasSave=false;
             openedFileDirectory ="";
@@ -67,7 +71,7 @@ namespace DarkPad {
             //Chamando funções iniciais
             UpdateTitle("");
             ChangeTheme(theme, false);
-            UpdateInitialDirectory(Temas.InitialDirectory);
+            UpdateInitialDirectory(Directory.Exists(Temas.InitialDirectory) ? Temas.InitialDirectory : Directory.GetCurrentDirectory());
         }
 
         private void Main_Load(object sender, EventArgs e) { //form_main Load (Esse método é para o abrir com...)
@@ -154,8 +158,6 @@ namespace DarkPad {
         }
 
         private bool SaveFile(string fileName) { //Salvar arquivo
-            StreamWriter gravador;
-            FileStream arquivo;
             string text = myText.Text.Replace("\r\n", "\n");
             //string text = myText.Text.Replace("\r\n", ""); //Isso é para não ficar com quebra de linha dobrada ao salvar
             try {
@@ -165,19 +167,17 @@ namespace DarkPad {
                  * Deletando o arquivo e recriando resolve o problema...
                 */
                 if(File.Exists(fileName)) File.Delete(fileName); //Deletando o arquivo porque não estava salvando alguns arquivos...
-                Console.WriteLine("\nFileName: {0}", fileName);
+                /*Console.WriteLine("\nFileName: {0}", fileName);
                 Console.WriteLine("\nText: {0}", text);
-                Console.WriteLine("\nAltVerif: {0}", altVerif);
-                arquivo=new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
-                gravador=new StreamWriter(arquivo);
-
-                gravador.Flush();
-                gravador.BaseStream.Seek(0, SeekOrigin.Begin);
-                gravador.Write(text);
-                gravador.Flush();
-
-                gravador.Close();
-                arquivo.Close();
+                Console.WriteLine("\nAltVerif: {0}", altVerif);*/
+                using(var arquivo= new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write)) {
+                    using(var gravador = new StreamWriter(arquivo)){
+                        gravador.Flush();
+                        gravador.BaseStream.Seek(0, SeekOrigin.Begin);
+                        gravador.Write(text);
+                        gravador.Flush();
+                    }
+                }
             } catch(Exception ex) {
                 MessageBox.Show("Não foi possível salvar o arquivo\n"+ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -188,22 +188,25 @@ namespace DarkPad {
 
         private void OpenFile(string fileName) { //Abrir arquivo
             string linha = null;
-            FileStream arquivo = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            StreamReader leitor = new StreamReader(arquivo);
             string text = "";
 
-            leitor.BaseStream.Seek(0, SeekOrigin.Begin);
-            myText.Clear();
-            linha=leitor.ReadLine();
-            while(linha!=null) {
-                //myText.Text+=linha+"\n"; - RichTextBox
-                text+=linha+"\n";
-                linha=leitor.ReadLine();
+            try {
+                using(var arquivo = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
+                    using(var leitor = new StreamReader(arquivo)) {
+                        leitor.BaseStream.Seek(0, SeekOrigin.Begin);
+                        myText.Clear();
+                        linha=leitor.ReadLine();
+                        while(linha!=null) {
+                            //myText.Text+=linha+"\n"; - RichTextBox
+                            text+=linha+"\n";
+                            linha=leitor.ReadLine();
+                        }
+                        myText.Text=text.Replace("\n", "\r\n"); //Substituindo \n por \r\n, porque o TextBox não suporta o \n comum por algum motivo...
+                    }
+                }
+            } catch(Exception ex) {
+                MessageBox.Show("Não foi possível abrir o arquivo\n"+ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            myText.Text=text.Replace("\n", "\r\n"); //Substituindo \n por \r\n, porque o TextBox não suporta o \n comum por algum motivo...
-
-            leitor.Close();
-            arquivo.Close();
         }
         
         public static int Locate(string toLocate, int type, bool caseSense, int initialLocate) { //Serve pra localizar a próxima palavra ou anterior passada no form_localizar
@@ -431,10 +434,10 @@ namespace DarkPad {
             MessageBox.Show("DarkPad Versão 2.0\n" +
                             "Desenvolvido por Frankley Patrício. Todos os Direitos Reservados © 2020\n" +
                             "Acesse o reposítório no GitHub para mais informações\n" +
-                            "https://github.com/frankleypatricio/DarkPad", "Sobre o Darkpad", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            github, "Sobre o Darkpad", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void Ajuda_Click(object sender, EventArgs e) { //Botão Exibir Ajuda
-            
+            Process.Start(github);
         }
         //Fim -> Menu Ajuda
 
@@ -456,16 +459,17 @@ namespace DarkPad {
         //EDITAR ISSO AQUI, TALVEZ SOBREESCREVER A FUNÇÃO " ONCLOSING "
         private void form_main_FormClosing(object sender, FormClosingEventArgs e) {
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
+            int[] formSize = new int[] { this.Width, this.Height };
 
-            if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na text_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na text_box é de um arquivo aberto e foi alterado
 
             if(result==DialogResult.Cancel) return; //Se cancelou o fechamento
 
-            if(this.Width != Temas.FormSize[0] || this.Height != Temas.FormSize[1]) { //Se alterou o size do form
-                int[] formSize = new int[] { this.Width, this.Height };
-                Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
-            }
+            /*if(this.Width != Temas.FormSize[0] || this.Height != Temas.FormSize[1]) { //Se alterou o size do form
+                formSize=new int[] { this.Width, this.Height };
+            }*/
+            Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
         }
     }
 
