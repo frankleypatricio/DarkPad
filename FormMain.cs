@@ -8,6 +8,8 @@ using System.Windows.Forms;
 namespace DarkPad {
     public partial class form_main : Form {
         private const string github = "https://github.com/frankleypatricio/DarkPad";
+        private const int minWidth = 564;
+        private const int minHeight = 380;
 
         private string[] args; //Argumentos de entrada
         private string altVerif; //Guarda texto original para verificar se houve alterações no arquivo
@@ -25,8 +27,9 @@ namespace DarkPad {
 
         public form_main(string[] args) {
             InitializeComponent();
-            //Definindo MyTextBox
             this.args=args;
+
+            //Definindo MyTextBox
             myText.Multiline=true;
             myText.BackColor=Color.FromArgb(45, 45, 48);
             myText.ForeColor=Color.FromArgb(255,255,255);
@@ -48,7 +51,7 @@ namespace DarkPad {
             //Carregando configurações de Tema
             Temas.LoadConfig();
             theme=Temas.Theme;
-            this.Size=new Size(Temas.FormSize[0], Temas.FormSize[1]); //Alterando size do form para o salvo no arquivo config
+            this.Size=(Temas.FormSize[0]>=minWidth&&Temas.FormSize[1]>=minHeight) ? new Size(Temas.FormSize[0], Temas.FormSize[1]) : new Size(minWidth, minHeight);
             myText.Font=new Font(Temas.FontFamily, Temas.FontSize, FontStyle.Regular);
 
             //Inicializando variáveis
@@ -459,7 +462,7 @@ namespace DarkPad {
         //EDITAR ISSO AQUI, TALVEZ SOBREESCREVER A FUNÇÃO " ONCLOSING "
         private void form_main_FormClosing(object sender, FormClosingEventArgs e) {
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
-            int[] formSize = new int[] { this.Width, this.Height };
+            int[] formSize = (this.Width>=minWidth && this.Height>=minHeight) ? new int[] { this.Width, this.Height } : new int[] { minWidth, minHeight };
 
             if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na text_box não é de um arquivo aberto e não é vazio
             else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na text_box é de um arquivo aberto e foi alterado

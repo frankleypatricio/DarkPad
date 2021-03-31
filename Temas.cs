@@ -5,7 +5,6 @@ using System.Windows.Forms;
 
 namespace DarkPad {
     public static class Temas {
-        private static int x = 0;
         private static readonly string[] configParams = new string[] { "theme", "font-family", "font-size", "form-width", "form-height", "initial-directory" }; // Parâmetros das configurações
         private static int theme=0;
         private static string fontFamily= "Arial Rounded MT Bold";
