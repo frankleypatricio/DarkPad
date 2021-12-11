@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using DarkPad.Util;
 using DarkPad.Components;
+using System.ComponentModel;
 
 namespace DarkPad.Views {
     public partial class form_main : Form {
@@ -439,20 +440,24 @@ namespace DarkPad.Views {
             if(e.Control&&e.KeyCode==Keys.H) Replace_Click(null, null);
         }
 
-        //EDITAR ISSO AQUI, TALVEZ SOBREESCREVER A FUNÇÃO " ONCLOSING "
-        private void form_main_FormClosing(object sender, FormClosingEventArgs e) {
+        protected override void OnClosing(CancelEventArgs e) {
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
             int[] formSize = (this.Width>=minWidth && this.Height>=minHeight) ? new int[] { this.Width, this.Height } : new int[] { minWidth, minHeight };
 
             if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na text_box não é de um arquivo aberto e não é vazio
             else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na text_box é de um arquivo aberto e foi alterado
 
-            if(result==DialogResult.Cancel) return; //Se cancelou o fechamento
+            if(result==DialogResult.Cancel) {
+                e.Cancel = true;
+                return; //Se cancelou o fechamento
+            }
 
-            /*if(this.Width != Temas.FormSize[0] || this.Height != Temas.FormSize[1]) { //Se alterou o size do form
-                formSize=new int[] { this.Width, this.Height };
-            }*/
             Temas.SaveConfig(theme, myText.Font.FontFamily.Name, myText.Font.Size, formSize, Temas.InitialDirectory);
+            base.OnClosing(e);
+        }
+
+        private void print(object value) {
+            Console.WriteLine(value);
         }
     }
 

@@ -392,7 +392,6 @@
             this.Name = "form_main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DarkPad";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.form_main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
             this.menu_main.ResumeLayout(false);
             this.menu_main.PerformLayout();
