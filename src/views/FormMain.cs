@@ -302,10 +302,8 @@ namespace DarkPad.Views {
             }
         }
 
-        private void NewWindow_Click(object sender, EventArgs e) { //Botão Nova janela
-            //Não tá pegando porque está fazendo referência ao form_main já aberto...
-            new form_main(null).Show();
-        }
+        private void NewWindow_Click(object sender, EventArgs e) //Botão Nova janela
+            => Process.Start(Global.WorkingDirectory+"\\DarkPad.exe");
 
         private void OpenFile_Click(object sender, EventArgs e) { //Botão Abrir
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)

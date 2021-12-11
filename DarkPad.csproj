@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\util\Global.cs" />
     <Compile Include="src\views\FormLocalizar.cs">
       <SubType>Form</SubType>
     </Compile>
