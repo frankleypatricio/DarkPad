@@ -1,4 +1,4 @@
-﻿namespace DarkPad {
+﻿namespace DarkPad.Views {
     partial class form_locate {
         /// <summary>
         /// Required designer variable.

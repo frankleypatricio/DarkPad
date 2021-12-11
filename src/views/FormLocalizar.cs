@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DarkPad.Util;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace DarkPad {
+namespace DarkPad.Views {
     public partial class form_locate : Form {
         //Listas para os componentes do form
         private readonly TabControl.TabPageCollection tabPages;

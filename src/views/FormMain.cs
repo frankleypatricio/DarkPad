@@ -4,8 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
+using DarkPad.Util;
+using DarkPad.Components;
 
-namespace DarkPad {
+namespace DarkPad.Views {
     public partial class form_main : Form {
         private const string github = "https://github.com/frankleypatricio/DarkPad";
         private const int minWidth = 564;
@@ -400,34 +402,12 @@ namespace DarkPad {
             }
         }
 
-        private void Tema0_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
-            if(!toolStripThemes[0].Checked) {
-                ChangeTheme(0,true);
-                toolStripThemes[0].Checked=true;
-            }
-        }
-        private void Tema1_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
-            if(!toolStripThemes[1].Checked) {
-                ChangeTheme(1,true);
-                toolStripThemes[1].Checked=true;
-            }
-        }
-        private void Tema2_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
-            if(!toolStripThemes[2].Checked) {
-                ChangeTheme(2, true);
-                toolStripThemes[2].Checked=true;
-            }
-        }
-        private void Tema3_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
-            if(!toolStripThemes[3].Checked) {
-                ChangeTheme(3, true);
-                toolStripThemes[3].Checked=true;
-            }
-        }
-        private void Tema4_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
-            if(!toolStripThemes[4].Checked) {
-                ChangeTheme(4, true);
-                toolStripThemes[4].Checked=true;
+        private void Tema_Click(object sender, EventArgs e) { //Botão Tema Dark Grey-Blue...
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            int id = int.Parse(item.Tag.ToString());
+            if(!toolStripThemes[id].Checked) {
+                ChangeTheme(id, true);
+                toolStripThemes[id].Checked=true;
             }
         }
         //Fim -> Menu Formatar

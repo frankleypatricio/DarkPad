@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace DarkPad {
+namespace DarkPad.Components {
     class MyTextBox:TextBox {
         public event EventHandler SelectionChanged;
 

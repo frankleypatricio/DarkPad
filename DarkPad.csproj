@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Darkpad.ico</ApplicationIcon>
+    <ApplicationIcon>assets\Darkpad.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>DarkPad.Program</StartupObject>
@@ -68,28 +68,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormLocalizar.cs">
+    <Compile Include="src\views\FormLocalizar.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormLocalizar.Designer.cs">
+    <Compile Include="src\views\FormLocalizar.Designer.cs">
       <DependentUpon>FormLocalizar.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormMain.cs">
+    <Compile Include="src\views\FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormMain.Designer.cs">
+    <Compile Include="src\views\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyTextBox.cs">
+    <Compile Include="src\components\MyTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Temas.cs" />
-    <EmbeddedResource Include="FormLocalizar.resx">
+    <Compile Include="src\util\Temas.cs" />
+    <EmbeddedResource Include="src\views\FormLocalizar.resx">
       <DependentUpon>FormLocalizar.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormMain.resx">
+    <EmbeddedResource Include="src\views\FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -116,8 +116,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="txt.ico" />
-    <None Include="Darkpad.ico" />
+    <None Include="assets\txt.ico" />
+    <None Include="assets\Darkpad.ico" />
     <None Include="Resources\Darkpad1.ico" />
   </ItemGroup>
   <ItemGroup>

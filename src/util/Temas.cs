@@ -3,7 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace DarkPad {
+namespace DarkPad.Util {
     public static class Temas {
         private static readonly string[] configParams = new string[] { "theme", "font-family", "font-size", "form-width", "form-height", "initial-directory" }; // Parâmetros das configurações
         private static int theme=0;
@@ -109,7 +109,8 @@ namespace DarkPad {
                 case 1: return Color.FromArgb(19,20,31);
                 case 2: return Color.FromArgb(16, 29, 37);
                 case 3: return Color.FromArgb(45, 45, 48);
-                case 4: return Color.FromArgb(255, 255, 255);
+                case 4: return Color.FromArgb(51, 54, 66);
+                case 5: return Color.FromArgb(255, 255, 255);
                 default: return Color.FromArgb(45, 45, 48);
             }
         }
@@ -120,7 +121,8 @@ namespace DarkPad {
                 case 1: return Color.FromArgb(230, 11, 76);
                 case 2: return Color.FromArgb(18, 167, 152);
                 case 3: return Color.FromArgb(254, 184, 0);
-                case 4: return Color.FromArgb(255, 255, 255);
+                case 4: return Color.FromArgb(9, 247, 227);
+                case 5: return Color.FromArgb(255, 255, 255);
                 default: return Color.FromArgb(0, 122, 204);
             }
         }
@@ -131,18 +133,20 @@ namespace DarkPad {
                 case 1: return Color.FromArgb(64, 67, 103);
                 case 2: return Color.FromArgb(35, 45, 54);
                 case 3: return Color.FromArgb(28, 28, 28);
-                case 4: return Color.FromArgb(240, 240, 240);
+                case 4: return Color.FromArgb(98, 98, 136);
+                case 5: return Color.FromArgb(240, 240, 240);
                 default: return Color.FromArgb(28, 28, 28);
             }
         }
 
         public static Color GetFontColor(int theme) {
             switch(theme) {
-                case 0: return Color.FromArgb(255,255,255);
-                case 1: return Color.FromArgb(255, 255, 255);
-                case 2: return Color.FromArgb(255, 255, 255);
+                case 0:
+                case 1:
+                case 2:
                 case 3: return Color.FromArgb(255, 255, 255);
-                case 4: return Color.FromArgb(0, 0, 0);
+                case 4: return Color.FromArgb(98, 98, 136);
+                case 5: return Color.FromArgb(0, 0, 0);
                 default: return Color.FromArgb(255, 255, 255);
             }
         }
@@ -153,17 +157,19 @@ namespace DarkPad {
                 case 1: return Color.FromArgb(205, 95, 128);
                 case 2: return Color.FromArgb(13, 115, 105);
                 case 3: return Color.FromArgb(214, 126, 10);
-                case 4: return Color.FromArgb(229, 243, 255);
+                case 4: return Color.FromArgb(6, 180, 166);
+                case 5: return Color.FromArgb(229, 243, 255);
                 default: return Color.FromArgb(9, 158, 182);
             }
         }
 
         public static Color GetMenuBorderColor(int theme) {
             switch(theme) {
-                case 0: return Color.FromArgb(255, 255, 255);
-                case 1: return Color.FromArgb(255, 255, 255);
-                case 2: return Color.FromArgb(255, 255, 255);
-                case 3: return Color.FromArgb(255, 255, 255);
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 5: return Color.FromArgb(255, 255, 255);
                 case 4: return Color.FromArgb(0, 0, 0);
                 default: return Color.FromArgb(255, 255, 255);
             }

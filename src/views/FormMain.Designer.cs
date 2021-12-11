@@ -1,4 +1,4 @@
-﻿namespace DarkPad {
+﻿namespace DarkPad.Views {
     partial class form_main {
         /// <summary>
         /// Variável de designer necessária.
@@ -49,6 +49,7 @@
             this.tool_tema2 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_tema3 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_tema4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tool_tema5 = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_ajuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_exibirAjuda = new System.Windows.Forms.ToolStripMenuItem();
             this.tool_sobre = new System.Windows.Forms.ToolStripMenuItem();
@@ -249,7 +250,7 @@
             this.tool_fonte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_fonte.ForeColor = System.Drawing.Color.White;
             this.tool_fonte.Name = "tool_fonte";
-            this.tool_fonte.Size = new System.Drawing.Size(123, 22);
+            this.tool_fonte.Size = new System.Drawing.Size(180, 22);
             this.tool_fonte.Text = "Fonte...";
             this.tool_fonte.Click += new System.EventHandler(this.Font_Click);
             // 
@@ -261,10 +262,11 @@
             this.tool_tema1,
             this.tool_tema2,
             this.tool_tema3,
-            this.tool_tema4});
+            this.tool_tema4,
+            this.tool_tema5});
             this.tool_tema.ForeColor = System.Drawing.Color.White;
             this.tool_tema.Name = "tool_tema";
-            this.tool_tema.Size = new System.Drawing.Size(123, 22);
+            this.tool_tema.Size = new System.Drawing.Size(180, 22);
             this.tool_tema.Text = "Tema";
             // 
             // tool_tema0
@@ -272,45 +274,60 @@
             this.tool_tema0.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema0.ForeColor = System.Drawing.Color.White;
             this.tool_tema0.Name = "tool_tema0";
-            this.tool_tema0.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema0.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema0.Tag = "0";
             this.tool_tema0.Text = "Dark Grey-Blue";
-            this.tool_tema0.Click += new System.EventHandler(this.Tema0_Click);
+            this.tool_tema0.Click += new System.EventHandler(this.Tema_Click);
             // 
             // tool_tema1
             // 
             this.tool_tema1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema1.ForeColor = System.Drawing.Color.White;
             this.tool_tema1.Name = "tool_tema1";
-            this.tool_tema1.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema1.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema1.Tag = "1";
             this.tool_tema1.Text = "Dark Purple-Hot Pink";
-            this.tool_tema1.Click += new System.EventHandler(this.Tema1_Click);
+            this.tool_tema1.Click += new System.EventHandler(this.Tema_Click);
             // 
             // tool_tema2
             // 
             this.tool_tema2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema2.ForeColor = System.Drawing.Color.White;
             this.tool_tema2.Name = "tool_tema2";
-            this.tool_tema2.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema2.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema2.Tag = "2";
             this.tool_tema2.Text = "Dark Blue-Green";
-            this.tool_tema2.Click += new System.EventHandler(this.Tema2_Click);
+            this.tool_tema2.Click += new System.EventHandler(this.Tema_Click);
             // 
             // tool_tema3
             // 
             this.tool_tema3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema3.ForeColor = System.Drawing.Color.White;
             this.tool_tema3.Name = "tool_tema3";
-            this.tool_tema3.Size = new System.Drawing.Size(208, 22);
+            this.tool_tema3.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema3.Tag = "3";
             this.tool_tema3.Text = "Dark Grey-Yellow";
-            this.tool_tema3.Click += new System.EventHandler(this.Tema3_Click);
+            this.tool_tema3.Click += new System.EventHandler(this.Tema_Click);
             // 
             // tool_tema4
             // 
             this.tool_tema4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_tema4.ForeColor = System.Drawing.Color.White;
             this.tool_tema4.Name = "tool_tema4";
-            this.tool_tema4.Size = new System.Drawing.Size(208, 22);
-            this.tool_tema4.Text = "White-Classic";
-            this.tool_tema4.Click += new System.EventHandler(this.Tema4_Click);
+            this.tool_tema4.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema4.Tag = "4";
+            this.tool_tema4.Text = "Dark Purple-Turquoise";
+            this.tool_tema4.Click += new System.EventHandler(this.Tema_Click);
+            // 
+            // tool_tema5
+            // 
+            this.tool_tema5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.tool_tema5.ForeColor = System.Drawing.Color.White;
+            this.tool_tema5.Name = "tool_tema5";
+            this.tool_tema5.Size = new System.Drawing.Size(215, 22);
+            this.tool_tema5.Tag = "5";
+            this.tool_tema5.Text = "White-Classic";
+            this.tool_tema5.Click += new System.EventHandler(this.Tema_Click);
             // 
             // tool_ajuda
             // 
@@ -416,6 +433,7 @@
         private System.Windows.Forms.ToolStripMenuItem tool_tema1;
         private System.Windows.Forms.ToolStripMenuItem tool_tema2;
         private System.Windows.Forms.ToolStripMenuItem tool_tema3;
+        private System.Windows.Forms.ToolStripMenuItem tool_tema5;
         private System.Windows.Forms.ToolStripMenuItem tool_tema4;
     }
 }
