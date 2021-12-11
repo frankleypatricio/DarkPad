@@ -21,6 +21,7 @@ namespace DarkPad.Components {
             }
             return pos;
         }
+
         public int Find(string str, bool caseSensitive) {
             int pos;
             try {
@@ -39,6 +40,5 @@ namespace DarkPad.Components {
         public void SelectionHasChanged(object sender, MouseEventArgs e) {
             if(SelectedText != "") SelectionChanged?.Invoke(this, new EventArgs());
         }
-
     }
 }

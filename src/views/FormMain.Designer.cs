@@ -250,7 +250,7 @@
             this.tool_fonte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
             this.tool_fonte.ForeColor = System.Drawing.Color.White;
             this.tool_fonte.Name = "tool_fonte";
-            this.tool_fonte.Size = new System.Drawing.Size(180, 22);
+            this.tool_fonte.Size = new System.Drawing.Size(123, 22);
             this.tool_fonte.Text = "Fonte...";
             this.tool_fonte.Click += new System.EventHandler(this.Font_Click);
             // 
@@ -266,7 +266,7 @@
             this.tool_tema5});
             this.tool_tema.ForeColor = System.Drawing.Color.White;
             this.tool_tema.Name = "tool_tema";
-            this.tool_tema.Size = new System.Drawing.Size(180, 22);
+            this.tool_tema.Size = new System.Drawing.Size(123, 22);
             this.tool_tema.Text = "Tema";
             // 
             // tool_tema0

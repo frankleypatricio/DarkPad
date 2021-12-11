@@ -37,11 +37,15 @@ namespace DarkPad.Views {
             myText.HideSelection=false; //Isso faz com que a seleção não seja ocultada ao perder o foco do form
             myText.ScrollBars=ScrollBars.Vertical; 
             myText.Dock=DockStyle.Fill;
+            myText.AllowDrop=true;
+            myText.AcceptsTab=true;
             //Eventos
             myText.KeyUp+=new KeyEventHandler(Hotkeys_KeyUp);
             myText.SelectionChanged+=new EventHandler(SelectionChanged);
             myText.MouseUp+=new MouseEventHandler(myText.SelectionHasChanged); //Serve pra acionar o SelectionChanged quando o usuário seleciona manualmente
             myText.TextChanged+=new EventHandler(MyText_TextChanged);
+            myText.DragEnter+=new DragEventHandler(MyText_DragEnter);
+            myText.DragDrop+=new DragEventHandler(MyText_DragDrop);
             //Adivionando ao form
             Controls.Add(myText);
             myText.BringToFront();
@@ -56,8 +60,6 @@ namespace DarkPad.Views {
             altVerif="";
             hasSave=false;
             openedFileDirectory ="";
-            //staticRichText=myText;
-            //staticFormMain=this;
             menu_main.Renderer=new MyRenderer(theme); //Adicionando o nosso Renderer personalizado ao menu_main
 
             //Preenchendo listas de ToolStripMenuItem
@@ -145,14 +147,14 @@ namespace DarkPad.Views {
             DialogResult result = MessageBox.Show("Salvar alterações no arquivo?", "Darkpad", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
             if(result==DialogResult.Yes) {
-                if(isFileExiste==false) { //Arquivo não existe
+                if(!isFileExiste) { //Arquivo não existe
 
                     if(save_file.ShowDialog()==DialogResult.OK) {
                         if(SaveFile(save_file.FileName)==false) return DialogResult.Cancel;
                         UpdateInitialDirectory(save_file.FileName.Remove(save_file.FileName.LastIndexOf(@"\")));
                     } else return DialogResult.Cancel;
 
-                } else if(SaveFile(save_file.FileName)==false) return DialogResult.Cancel;
+                } else if(SaveFile(openedFileDirectory)==false) return DialogResult.Cancel;
             }
             return result;
         }
@@ -162,14 +164,14 @@ namespace DarkPad.Views {
             //string text = myText.Text.Replace("\r\n", ""); //Isso é para não ficar com quebra de linha dobrada ao salvar
             try {
                 /* Obs:
-                 * Não está salvando alterações em arquivos existente que tenham links, desde que essa alteração seja apenas
-                 * apagando algum conteúdo. Caso adicione algo, ele salva normalmente.
+                 * Não está salvando alterações em arquivos existente que tenham links e tento apagar esse link.
+                 * Caso adicione algo, ele salva normalmente.
                  * Deletando o arquivo e recriando resolve o problema...
                 */
                 if(File.Exists(fileName)) File.Delete(fileName); //Deletando o arquivo porque não estava salvando alguns arquivos...
-                /*Console.WriteLine("\nFileName: {0}", fileName);
+                Console.WriteLine("\nFileName: {0}", fileName);
                 Console.WriteLine("\nText: {0}", text);
-                Console.WriteLine("\nAltVerif: {0}", altVerif);*/
+                Console.WriteLine("\nAltVerif: {0}", altVerif);
                 using(var arquivo= new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write)) {
                     using(var gravador = new StreamWriter(arquivo)){
                         gravador.Flush();
@@ -253,11 +255,8 @@ namespace DarkPad.Views {
             MessageBox.Show("Ocorrências substituidas com sucesso!", "Concluído", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public void Tab() {
-            int pos = myText.SelectionStart;
-            myText.Text=myText.Text.Insert(myText.SelectionStart, "\t");
-            myText.SelectionStart=++pos;
-        }
+        private void NovaJanela(string args = "")
+            => Process.Start(Global.WorkingDirectory+"\\DarkPad.exe", args);
 
         private void SelectionChanged(object sender, EventArgs e) { //Alterou seleção (isso é pro localizar/substituir)
             if(myText.SelectionLength>0) initialLocate=myText.SelectionStart;
@@ -273,6 +272,43 @@ namespace DarkPad.Views {
             }else if(myText.Text == altVerif) {
                 if(this.Text.Contains("*")) this.Text=this.Text.Remove(0, 1);
                 hasSave=false;
+            }
+        }
+
+        private void MyText_DragEnter(object sender, DragEventArgs e) {
+            if(e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect=DragDropEffects.Copy;
+            else
+                e.Effect=DragDropEffects.None;
+        }
+        private void MyText_DragDrop(object sender, DragEventArgs e) {
+            if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+                try {
+                    string[] data = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    bool first = true;
+                    foreach(string file in data) {
+                        if(first) {
+                            DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
+
+                            if(myText.Text!=""&&openedFileDirectory=="")
+                                result=SaveChanges(false); //Se tem conteúdo na textbox não é de um arquivo aberto e não é vazio
+                            else if(openedFileDirectory!=""&&altVerif!=myText.Text)
+                                result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+
+                            if(result!=DialogResult.Cancel) {
+                                OpenFile(file);
+                                altVerif=myText.Text;
+                                hasSave=false;
+                                UpdateTitle(file);
+                                first=false;
+                            }
+                            continue;
+                        }
+                        NovaJanela(file);
+                    }
+                } catch(Exception ex) {
+                    MessageBox.Show(ex.Message, "Falha ao carregar arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -292,13 +328,13 @@ namespace DarkPad.Views {
         }
 
         private void NewWindow_Click(object sender, EventArgs e) //Botão Nova janela
-            => Process.Start(Global.WorkingDirectory+"\\DarkPad.exe");
+            => NovaJanela();
 
         private void OpenFile_Click(object sender, EventArgs e) { //Botão Abrir
             DialogResult result = DialogResult.None; //Para saber resultado do SaveChanges (se a pessoa não cancelou basicamente)
 
-            if(myText.Text!=""&&openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
-            else if(openedFileDirectory!=""&&altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
+            if(myText.Text!="" && openedFileDirectory=="") result=SaveChanges(false); //Se tem conteúdo na rich_box não é de um arquivo aberto e não é vazio
+            else if(openedFileDirectory!="" && altVerif!=myText.Text) result=SaveChanges(true); //Se tem conteúdo na rich_box é de um arquivo aberto e foi alterado
 
             if(result!=DialogResult.Cancel&&open_file.ShowDialog()==DialogResult.OK) {
                 OpenFile(open_file.FileName);
@@ -426,9 +462,6 @@ namespace DarkPad.Views {
             if(e.KeyCode == Keys.F3) LocateNext_Click(null, null);
             if(e.KeyCode == Keys.F4) LocatePrevious_Click(null, null);
             if(e.Control && e.KeyCode == Keys.H) Replace_Click(null, null);
-
-            if(!e.Shift && !e.Control && e.KeyCode == Keys.Tab) Tab();
-            //if(e.Shift && !e.Control && e.KeyCode == Keys.Tab) Tab(false);
         }
 
         protected override void OnClosing(CancelEventArgs e) {
